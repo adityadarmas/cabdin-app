@@ -16,7 +16,8 @@ use App\Http\Controllers\ProdukController;
 */
 
 // ================== HALAMAN UMUM ==================
-Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/landing', [LandingController::class, 'index'])->name('landing');
+Route::get('/', [LandingController::class, 'error']);
 
 Route::get('/produk/create', [ProdukController::class, 'create'])
     ->name('produk.create');

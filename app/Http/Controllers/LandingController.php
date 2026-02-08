@@ -21,4 +21,8 @@ class LandingController extends Controller
             'produk'   => Produk::where('is_active', 1)->get(),
         ]);
     }
+
+    public function error(){
+        return view('error');
+    }
 }
