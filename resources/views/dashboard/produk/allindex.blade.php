@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Semua Produk - E-Cabdin</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>

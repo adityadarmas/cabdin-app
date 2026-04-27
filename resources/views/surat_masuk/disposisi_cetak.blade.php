@@ -1,239 +1,253 @@
-{{--
-    ============================================================
-    TEMPLATE LEMBAR DISPOSISI — DAPAT DISESUAIKAN
-    ============================================================
-    File ini adalah template cetak lembar disposisi.
-    Anda bisa mengubah:
-      - Nama instansi / header di bagian "HEADER INSTANSI"
-      - Tata letak tabel di bagian "TABEL INFO SURAT"
-      - Pilihan "Dengan Hormat Harap" di bagian "DENGAN HORMAT HARAP"
-      - Area tanda tangan di bagian "TANDA TANGAN"
-    ============================================================
---}}
 @extends('layouts.app')
 
 @php
-    // ── Parse "dengan_hormat_harap" ──────────────────────────
-    // Format simpan: "Pilihan 1, Pilihan 2 | Keterangan tambahan"
     $rawHarap     = $suratMasuk->dengan_hormat_harap ?? '';
     $harapParts   = explode(' | ', $rawHarap, 2);
     $harapPilihan = $harapParts[0] ? array_map('trim', explode(',', $harapParts[0])) : [];
     $harapKet     = trim($harapParts[1] ?? '');
 
-    // ── Daftar opsi "Dengan Hormat Harap" ───────────────────
-    // Tambah atau ubah opsi di sini sesuai kebutuhan instansi
     $opsiHarap = [
         'Tanggapan dan saran',
         'Proses lebih lanjut',
-        'Koordinasikan / konfirmasikan',
+        'Koordinasi/Konfirmasikan',
     ];
 
-    // ── Label sifat disposisi ────────────────────────────────
-    $sifatLabel = [
-        'sangat_segera' => 'Sangat Segera',
-        'segera'        => 'Segera',
-        'rahasia'       => 'Rahasia',
-    ];
-    $sifatTeks = $sifatLabel[$suratMasuk->sifat_dispo ?? ''] ?? ucfirst(str_replace('_', ' ', $suratMasuk->sifat_dispo ?? '-'));
+    $sifatAktif = $suratMasuk->sifat_dispo ?? '';
+
+    // Nama penerima (lowercase) untuk pencocokan checkbox tetap
+    $namaPenerima = $suratMasuk->penerima->pluck('name')->map(fn($n) => strtolower($n))->toArray();
+
+    $cekPenerima = function(string $keyword) use ($namaPenerima): bool {
+        foreach ($namaPenerima as $nama) {
+            if (str_contains($nama, strtolower($keyword))) return true;
+        }
+        return false;
+    };
 @endphp
 
 @section('content')
 
-    {{-- ===================================================
-         TOMBOL AKSI (tersembunyi saat cetak)
-         =================================================== --}}
-    <div class="no-print max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
-        <a href="{{ route('surat-masuk.index') }}"
-           class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 transition">
-            ← Kembali
-        </a>
-        <div class="ml-auto flex gap-2">
-            <button onclick="window.print()"
-                class="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition">
-                🖨️ Cetak Lembar Disposisi
-            </button>
+{{-- Tombol aksi (tersembunyi saat cetak) --}}
+<div class="no-print max-w-3xl mx-auto px-4 py-4 flex items-center gap-3">
+    <a href="{{ route('surat-masuk.index') }}"
+       class="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-slate-700 transition">
+        ← Kembali
+    </a>
+    <div class="ml-auto">
+        <button onclick="window.print()"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-sky-600 text-white text-sm font-medium rounded-lg hover:bg-sky-700 transition">
+            🖨️ Cetak Lembar Disposisi
+        </button>
+    </div>
+</div>
+
+{{-- Area cetak --}}
+<div id="lembar-disposisi" class="print-area max-w-3xl mx-auto px-4 pb-10">
+
+    {{-- ── HEADER INSTANSI ── --}}
+    <div style="display:flex; align-items:center; border-bottom:4px double #222; padding-bottom:10px; margin-bottom:12px;">
+        <img src="{{ asset('images/jatim.png') }}" alt="Logo Jawa Timur"
+             style="height:80px; width:auto; margin-right:14px; object-fit:contain;">
+        <div style="text-align:center; flex:1; line-height:1.4;">
+            <div style="font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px;">
+                Pemerintah Provinsi Jawa Timur
+            </div>
+            <div style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;">
+                Dinas Pendidikan
+            </div>
+            <div style="font-size:16px; font-weight:800; text-transform:uppercase; letter-spacing:.5px;">
+                Cabang Dinas Wilayah Kabupaten Malang
+            </div>
+            <div style="font-size:10px; margin-top:3px;">
+                Jalan Simpang Ijen Nomor 2, Oro-oro Dowo, Klojen, Malang, Jawa Timur 65119
+            </div>
+            <div style="font-size:10px;">
+                Telepon/Faksimile (0341) 5081868, Pos-el : cabdinmalang@gmail.com
+            </div>
         </div>
     </div>
 
-    {{-- ===================================================
-         AREA CETAK — modifikasi konten di dalam div ini
-         =================================================== --}}
-    <div id="lembar-disposisi" class="print-area max-w-3xl mx-auto px-4 pb-10">
+    {{-- ── JUDUL ── --}}
+    <div style="text-align:center; font-size:14px; font-weight:700; text-transform:uppercase;
+                letter-spacing:3px; border:1.5px solid #222; padding:6px 0; margin-bottom:0;">
+        Lembar Disposisi
+    </div>
 
-        {{-- ── HEADER INSTANSI ────────────────────────────
-             Sesuaikan nama instansi, alamat, dan nomor telepon
-             ─────────────────────────────────────────────── --}}
-        <div class="header-instansi border-b-4 border-double border-slate-800 pb-3 mb-4 flex items-center gap-4">
-            {{-- Logo (opsional — hapus tag img ini jika tidak diperlukan) --}}
-            {{-- <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-16 w-16 object-contain"> --}}
-            <div class="text-center flex-1">
-                <p class="text-xs font-semibold tracking-wide uppercase text-slate-700">Pemerintah Provinsi Jawa Timur</p>
-                <p class="text-base font-bold uppercase tracking-wide text-slate-900">Dinas Pendidikan</p>
-                <p class="text-sm font-bold uppercase tracking-wide text-slate-900">Cabang Dinas Pendidikan Wilayah Kabupaten Malang</p>
-                <p class="text-xs text-slate-600 mt-0.5">
-                    Jl. Raya ... No. ... Malang — Telp. (0341) ... — Fax. (0341) ...
-                </p>
+    {{-- ── TABEL UTAMA ── --}}
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <tbody>
+
+            {{-- Baris 1: Info surat (2 kolom) --}}
+            <tr>
+                {{-- Kiri: Surat Dari, Nomor Surat, Tgl Surat --}}
+                <td style="border:1px solid #555; padding:8px 12px; vertical-align:top; width:50%;">
+                    <table style="border-collapse:collapse; font-size:12px; width:100%;">
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:4px;">Surat Dari</td>
+                            <td style="vertical-align:top; padding:0 4px;">:</td>
+                            <td style="vertical-align:top;">{{ $suratMasuk->tamu->nama ?? ($suratMasuk->asal ?? '-') }}</td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:4px;">Nomor Surat</td>
+                            <td style="vertical-align:top; padding:0 4px;">:</td>
+                            <td style="vertical-align:top;">{{ $suratMasuk->nomor_surat ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:4px;">Tgl. Surat</td>
+                            <td style="vertical-align:top; padding:0 4px;">:</td>
+                            <td style="vertical-align:top;">
+                                {{ $suratMasuk->tgl_surat ? $suratMasuk->tgl_surat->translatedFormat('d F Y') : '-' }}
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+
+                {{-- Kanan: Diterima Tgl, Nomor Agenda, Sifat --}}
+                <td style="border:1px solid #555; padding:8px 12px; vertical-align:top; width:50%;">
+                    <table style="border-collapse:collapse; font-size:12px; width:100%;">
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:4px;">Diterima Tgl</td>
+                            <td style="vertical-align:top; padding:0 4px;">:</td>
+                            <td style="vertical-align:top;">
+                                {{ $suratMasuk->tgl_diterima ? $suratMasuk->tgl_diterima->translatedFormat('d F Y') : '-' }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:4px;">Nomor Agenda</td>
+                            <td style="vertical-align:top; padding:0 4px;">:</td>
+                            <td style="vertical-align:top;">{{ $suratMasuk->nomor_agenda ?? '-' }}</td>
+                        </tr>
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:4px;">Sifat</td>
+                            <td style="vertical-align:top; padding:0 4px;">:</td>
+                            <td style="vertical-align:top;">&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            {{-- Baris 2: Sifat checkboxes (kanan) --}}
+            <tr>
+                <td colspan="2" style="border:1px solid #555; padding:6px 12px; text-align:right;">
+                    <span style="display:inline-flex; align-items:center; gap:5px; margin-right:18px;">
+                        <span style="display:inline-block; width:13px; height:13px; border:1.5px solid #333;
+                                     text-align:center; line-height:11px; font-size:10px;">{{ $sifatAktif === 'sangat_segera' ? '✓' : '' }}</span>
+                        Sangat segera
+                    </span>
+                    <span style="display:inline-flex; align-items:center; gap:5px; margin-right:18px;">
+                        <span style="display:inline-block; width:13px; height:13px; border:1.5px solid #333;
+                                     text-align:center; line-height:11px; font-size:10px;">{{ $sifatAktif === 'segera' ? '✓' : '' }}</span>
+                        Segera
+                    </span>
+                    <span style="display:inline-flex; align-items:center; gap:5px;">
+                        <span style="display:inline-block; width:13px; height:13px; border:1.5px solid #333;
+                                     text-align:center; line-height:11px; font-size:10px;">{{ $sifatAktif === 'rahasia' ? '✓' : '' }}</span>
+                        Rahasia
+                    </span>
+                </td>
+            </tr>
+
+            {{-- Baris 3: Hal / Perihal --}}
+            <tr>
+                <td colspan="2" style="border:1px solid #555; padding:10px 12px; height:80px; vertical-align:top;">
+                    <table style="border-collapse:collapse; font-size:12px; width:100%;">
+                        <tr>
+                            <td style="vertical-align:top; white-space:nowrap; padding-right:8px; font-weight:500; width:30px;">Hal</td>
+                            <td style="vertical-align:top; padding-right:8px; width:6px;">|</td>
+                            <td style="vertical-align:top;">{{ $suratMasuk->perihal ?? '-' }}</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+
+            {{-- Baris 4: Diteruskan kepada & Dengan hormat harap --}}
+            <tr>
+                {{-- Kiri: Diteruskan kepada --}}
+                <td style="border:1px solid #555; padding:8px 12px; vertical-align:top;">
+                    <div style="font-weight:600; margin-bottom:8px;">Diteruskan kepada Sdr. :</div>
+
+                    @php
+                        $opsiPenerima = [
+                            'kasubbag' => 'KASUBBAG TU',
+                            'kasi sma' => 'KASI SMA/PK-PLK',
+                            'kasi smk' => 'KASI SMK',
+                        ];
+                    @endphp
+
+                    @foreach ($opsiPenerima as $keyword => $label)
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
+                            <span style="display:inline-block; width:13px; height:13px; border:1.5px solid #333;
+                                         flex-shrink:0; text-align:center; line-height:11px; font-size:10px;">
+                                {{ $cekPenerima($keyword) ? '✓' : '' }}
+                            </span>
+                            <span>{{ $label }}</span>
+                        </div>
+                    @endforeach
+
+                    <div style="margin-top:8px; font-size:12px;">Dan seterusnya .................................</div>
+                </td>
+
+                {{-- Kanan: Dengan hormat harap --}}
+                <td style="border:1px solid #555; padding:8px 12px; vertical-align:top;">
+                    <div style="font-weight:600; margin-bottom:8px;">Dengan hormat harap :</div>
+                    @foreach ($opsiHarap as $opsi)
+                        <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
+                            <span style="display:inline-block; width:13px; height:13px; border:1.5px solid #333;
+                                         flex-shrink:0; text-align:center; line-height:11px; font-size:10px;">
+                                {{ in_array($opsi, $harapPilihan) ? '✓' : '' }}
+                            </span>
+                            <span>{{ $opsi }}</span>
+                        </div>
+                    @endforeach
+                    @if ($harapKet)
+                        <div style="margin-top:6px; font-size:11px; color:#444;">{{ $harapKet }}</div>
+                    @else
+                        <div style="margin-top:8px; border-bottom:1px dotted #555; min-width:180px;">&nbsp;</div>
+                    @endif
+                </td>
+            </tr>
+
+            {{-- Baris 5: Catatan --}}
+            <tr>
+                <td colspan="2" style="border:1px solid #555; padding:8px 12px;">
+                    <span style="font-weight:600;">Catatan :</span>
+                    @if($suratMasuk->disposisi)
+                        <span style="margin-left:6px;">{{ $suratMasuk->disposisi }}</span>
+                    @else
+                        <span style="display:inline-block; border-bottom:1px dotted #555; width:80%; margin-left:6px;">&nbsp;</span>
+                    @endif
+                    <div style="border-bottom:1px dotted #555; margin-top:10px; min-height:16px;">&nbsp;</div>
+                </td>
+            </tr>
+
+        </tbody>
+    </table>
+
+    {{-- ── TANDA TANGAN ── --}}
+    <div style="display:flex; justify-content:flex-end; margin-top:18px; font-size:12px; text-align:center;">
+        <div style="min-width:230px;">
+            <div style="font-weight:700; text-transform:uppercase; line-height:1.5;">
+                Kepala Cabang Dinas Pendidikan<br>Wilayah Kabupaten Malang
+            </div>
+            <div style="height:70px;"></div>
+            <div style="font-weight:700; border-top:1.5px solid #222; padding-top:4px;">
+                DWI ANGGRAENI, S.Pd., M.Pd.
             </div>
         </div>
+    </div>
 
-        {{-- ── JUDUL ─────────────────────────────────────── --}}
-        <h2 class="text-center text-base font-bold uppercase tracking-widest text-slate-900 mb-4 border border-slate-700 py-1.5">
-            Lembar Disposisi
-        </h2>
+</div>{{-- end #lembar-disposisi --}}
 
-        {{-- ── TABEL INFO SURAT ─────────────────────────── --}}
-        <table class="w-full text-sm border border-slate-400 border-collapse mb-4">
-            <tbody>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700 w-2/5">Nomor Agenda</td>
-                    <td class="border border-slate-400 px-3 py-1.5">: {{ $suratMasuk->nomor_agenda ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700">Tanggal Diterima</td>
-                    <td class="border border-slate-400 px-3 py-1.5">
-                        : {{ $suratMasuk->tgl_diterima ? $suratMasuk->tgl_diterima->translatedFormat('d F Y') : '-' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700">Nomor Surat</td>
-                    <td class="border border-slate-400 px-3 py-1.5">: {{ $suratMasuk->nomor_surat }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700">Tanggal Surat</td>
-                    <td class="border border-slate-400 px-3 py-1.5">
-                        : {{ $suratMasuk->tgl_surat ? $suratMasuk->tgl_surat->translatedFormat('d F Y') : '-' }}
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700">Asal Surat</td>
-                    <td class="border border-slate-400 px-3 py-1.5">: {{ $suratMasuk->tamu->nama ?? ($suratMasuk->asal ?? '-') }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700">Perihal</td>
-                    <td class="border border-slate-400 px-3 py-1.5">: {{ $suratMasuk->perihal }}</td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700">Sifat</td>
-                    <td class="border border-slate-400 px-3 py-1.5">: {{ $sifatTeks }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        {{-- ── DITERUSKAN KEPADA ────────────────────────── --}}
-        <table class="w-full text-sm border border-slate-400 border-collapse mb-4">
-            <tbody>
-                <tr>
-                    <td colspan="2" class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700 bg-slate-50">
-                        Diteruskan Kepada
-                    </td>
-                </tr>
-                @forelse ($suratMasuk->penerima as $penerima)
-                    <tr>
-                        <td class="border border-slate-400 px-3 py-1.5 w-8 text-center">
-                            <span class="inline-block w-4 h-4 border border-slate-600 align-middle"></span>
-                        </td>
-                        <td class="border border-slate-400 px-3 py-1.5">{{ $penerima->name }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="2" class="border border-slate-400 px-3 py-1.5 italic text-slate-400">
-                            Belum ada penerima disposisi
-                        </td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-
-        {{-- ── DENGAN HORMAT HARAP ──────────────────────── --}}
-        <table class="w-full text-sm border border-slate-400 border-collapse mb-4">
-            <tbody>
-                <tr>
-                    <td colspan="2" class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700 bg-slate-50">
-                        Dengan Hormat Harap
-                    </td>
-                </tr>
-                @foreach ($opsiHarap as $opsi)
-                    <tr>
-                        <td class="border border-slate-400 px-3 py-1.5 w-8 text-center">
-                            @if(in_array($opsi, $harapPilihan))
-                                <span class="font-bold text-base">✓</span>
-                            @else
-                                <span class="inline-block w-4 h-4 border border-slate-600 align-middle"></span>
-                            @endif
-                        </td>
-                        <td class="border border-slate-400 px-3 py-1.5">{{ $opsi }}</td>
-                    </tr>
-                @endforeach
-                @if ($harapKet)
-                    <tr>
-                        <td colspan="2" class="border border-slate-400 px-3 py-1.5">
-                            <span class="font-semibold text-slate-700">Keterangan:</span>
-                            {{ $harapKet }}
-                        </td>
-                    </tr>
-                @endif
-            </tbody>
-        </table>
-
-        {{-- ── CATATAN DISPOSISI ────────────────────────── --}}
-        <table class="w-full text-sm border border-slate-400 border-collapse mb-4">
-            <tbody>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700 bg-slate-50">
-                        Catatan Disposisi
-                    </td>
-                </tr>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-3 min-h-[60px]" style="height: 70px; vertical-align: top;">
-                        {{ $suratMasuk->disposisi ?? '' }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        {{-- ── TANGGAL KEGIATAN ─────────────────────────── --}}
-        <table class="w-full text-sm border border-slate-400 border-collapse mb-6">
-            <tbody>
-                <tr>
-                    <td class="border border-slate-400 px-3 py-1.5 font-semibold text-slate-700 w-2/5">Tanggal Kegiatan</td>
-                    <td class="border border-slate-400 px-3 py-1.5">
-                        : {{ $suratMasuk->tgl_kegiatan ? $suratMasuk->tgl_kegiatan->translatedFormat('d F Y') : '-' }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        {{-- ── TANDA TANGAN ─────────────────────────────── --}}
-        {{-- Sesuaikan nama kota, jabatan, dan nama pejabat di sini --}}
-        <div class="flex justify-end text-sm text-slate-800">
-            <div class="text-center" style="min-width: 220px;">
-                <p>Malang, {{ now()->translatedFormat('d F Y') }}</p>
-                <p class="mt-1">Kepala Cabang Dinas Pendidikan</p>
-                <p>Wilayah Kab. Malang,</p>
-
-                {{-- Ruang tanda tangan --}}
-                <div style="height: 70px;"></div>
-
-                <p class="font-semibold border-t border-slate-700 pt-1 mt-1">(______________________________)</p>
-                <p class="text-xs text-slate-600">NIP. ________________________</p>
-            </div>
-        </div>
-
-    </div>{{-- end .print-area --}}
-
-    {{-- ===================================================
-         STYLE CETAK
-         =================================================== --}}
-    <style>
-        @media print {
-            .no-print          { display: none !important; }
-            nav, header,
-            footer, aside      { display: none !important; }
-            body               { background: white !important; }
-            #lembar-disposisi  { max-width: 100% !important; padding: 0 !important; }
-            .print-area        { padding: 0 !important; }
-            table              { page-break-inside: avoid; }
-        }
-    </style>
+<style>
+    @media print {
+        .no-print         { display: none !important; }
+        nav, header,
+        footer, aside     { display: none !important; }
+        body              { background: white !important; }
+        #lembar-disposisi { max-width: 100% !important; padding: 0 !important; }
+        .print-area       { padding: 0 !important; }
+        table             { page-break-inside: avoid; }
+    }
+</style>
 
 @endsection

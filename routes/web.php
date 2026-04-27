@@ -42,6 +42,9 @@ Route::post('/tamu', [TamuController::class, 'store'])->name('tamu.store');
 Route::get('/tamu/{tamu}/edit', [TamuController::class, 'edit'])->name('tamu.edit');
 Route::put('/tamu/{tamu}', [TamuController::class, 'update'])->name('tamu.update');
 
+// ================== SETUP AWAL (hanya jika belum ada admin) ==================
+Route::get('/setup/init-admin', [UserAccessController::class, 'initAdmin'])->name('setup.init-admin');
+
 // ================== GUEST ==================
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLogin'])->name('login');

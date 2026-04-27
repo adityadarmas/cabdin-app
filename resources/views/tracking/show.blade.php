@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tracking Surat - {{ $surat->nomor_surat }}</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
     <script src="https://cdn.tailwindcss.com"></script>
 
     {{-- Swiper CSS --}}

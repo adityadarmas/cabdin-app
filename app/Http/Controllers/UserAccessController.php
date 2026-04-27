@@ -131,4 +131,29 @@ class UserAccessController extends Controller
         return redirect()->route('admin.users.index')
                          ->with('success', 'User berhasil dihapus.');
     }
+
+    /**
+     * Buat akun admin default jika belum ada.
+     * Hanya bisa diakses jika belum ada user admin sama sekali.
+     * Route: GET /setup/init-admin  →  name: setup.init-admin
+     */
+    public function initAdmin()
+    {
+        $adminExists = User::where('role', 'admin')->exists();
+
+        if ($adminExists) {
+            return redirect()->route('login')
+                             ->with('info', 'Akun admin sudah tersedia. Silakan login.');
+        }
+
+        User::create([
+            'name'     => 'Administrator',
+            'email'    => 'admin@ecabdin.id',
+            'password' => Hash::make('Admin@12345'),
+            'role'     => 'admin',
+        ]);
+
+        return redirect()->route('login')
+                         ->with('success', 'Akun admin default berhasil dibuat. Email: admin@ecabdin.id | Password: Admin@12345');
+    }
 }

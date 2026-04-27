@@ -271,26 +271,74 @@
                     {{-- PILIH STAFF --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 mb-2">
-                            Tujuan (Staff) <span class="text-red-500">*</span>
+                            Diteruskan kepada Sdr. <span class="text-red-500">*</span>
                         </label>
 
-                        <div class="border border-slate-300 rounded-lg p-4 max-h-60 overflow-y-auto bg-slate-50">
-                            <label class="flex items-center gap-2 mb-3 pb-3 border-b border-slate-300">
-                                <input type="checkbox" id="select-all"
-                                    class="rounded border-slate-300 text-sky-600 focus:ring-sky-500">
-                                <span class="text-sm font-semibold text-slate-800">✓ Pilih Semua Staff</span>
-                            </label>
+                        @php
+                            $jabatanGrup = [
+                                'KASUBBAG TU'    => 'kasubbag',
+                                'KASI SMA/PK-PLK' => 'kasi sma',
+                                'KASI SMK'        => 'kasi smk',
+                            ];
 
-                            <div class="space-y-2">
-                                @foreach ($staff as $user)
-                                    <label class="flex items-center gap-3 hover:bg-white px-2 py-2 rounded transition cursor-pointer">
-                                        <input type="checkbox" name="staff_ids[]" value="{{ $user->id }}"
-                                            class="staff-checkbox rounded border-slate-300 text-sky-600 focus:ring-sky-500"
-                                            {{ $suratMasuk->penerima && $suratMasuk->penerima->contains($user->id) ? 'checked' : '' }}>
-                                        <span class="text-sm text-slate-700">{{ $user->name }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
+                            // Kelompokkan staff ke jabatan berdasarkan keyword nama
+                            $staffPerJabatan = [];
+                            $staffLainnya    = [];
+                            foreach ($staff as $user) {
+                                $namaBawah = strtolower($user->name);
+                                $cocok = false;
+                                foreach ($jabatanGrup as $label => $keyword) {
+                                    if (str_contains($namaBawah, $keyword)) {
+                                        $staffPerJabatan[$label][] = $user;
+                                        $cocok = true;
+                                        break;
+                                    }
+                                }
+                                if (!$cocok) $staffLainnya[] = $user;
+                            }
+                        @endphp
+
+                        <div class="border border-slate-300 rounded-lg p-4 bg-slate-50 space-y-3">
+
+                            @foreach ($jabatanGrup as $label => $keyword)
+                                @php $anggota = $staffPerJabatan[$label] ?? []; @endphp
+                                <div>
+                                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">{{ $label }}</p>
+                                    @if (count($anggota) > 0)
+                                        @foreach ($anggota as $user)
+                                            <label class="flex items-center gap-3 hover:bg-white px-2 py-1.5 rounded transition cursor-pointer">
+                                                <input type="checkbox" name="staff_ids[]" value="{{ $user->id }}"
+                                                    class="staff-checkbox rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                                                    {{ $suratMasuk->penerima && $suratMasuk->penerima->contains($user->id) ? 'checked' : '' }}>
+                                                <span class="text-sm text-slate-700">{{ $user->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    @else
+                                        {{-- Tidak ada staff yang cocok: tampilkan checkbox manual tanpa value --}}
+                                        <label class="flex items-center gap-3 px-2 py-1.5 opacity-50 cursor-not-allowed">
+                                            <input type="checkbox" disabled
+                                                class="rounded border-slate-300">
+                                            <span class="text-sm text-slate-500 italic">Belum ada akun untuk {{ $label }}</span>
+                                        </label>
+                                    @endif
+                                </div>
+                            @endforeach
+
+                            {{-- Staff yang tidak masuk 3 jabatan di atas --}}
+                            @if (count($staffLainnya) > 0)
+                                <div class="pt-2 border-t border-slate-200">
+                                    <p class="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-1">Dan Seterusnya</p>
+                                    @foreach ($staffLainnya as $user)
+                                        <label class="flex items-center gap-3 hover:bg-white px-2 py-1.5 rounded transition cursor-pointer">
+                                            <input type="checkbox" name="staff_ids[]" value="{{ $user->id }}"
+                                                class="staff-checkbox rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                                                {{ $suratMasuk->penerima && $suratMasuk->penerima->contains($user->id) ? 'checked' : '' }}>
+                                            <span class="text-sm text-slate-700">{{ $user->name }}</span>
+                                        </label>
+                                    @endforeach
+                                </div>
+                            @endif
+
                         </div>
 
                         @error('staff_ids')
