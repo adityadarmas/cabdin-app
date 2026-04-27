@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Prosedur;
+use App\Models\DapodikJadwal;
+use App\Models\KategoriProsedur;
 use App\Models\Berita;
 use App\Models\Produk;
 
@@ -16,9 +17,15 @@ class LandingController extends Controller
         }
 
         return view('landing', [
-            'prosedur' => Prosedur::where('is_active', 1)->orderBy('urutan')->get(),
-            'berita'   => Berita::where('is_active', 1)->latest()->limit(3)->get(),
-            'produk'   => Produk::where('is_active', 1)->get(),
+            'kategoriProsedur' => KategoriProsedur::where('is_active', true)
+                                    ->orderBy('urutan')
+                                    ->with(['prosedursAktif'])
+                                    ->get(),
+            'berita'           => Berita::where('is_active', 1)->latest()->limit(6)->get(),
+            'produk'           => Produk::where('is_active', 1)->get(),
+            'dapodikJadwals'   => DapodikJadwal::whereIn('jenis', ['edit_ptk', 'tambah_ptk'])
+                                    ->get()
+                                    ->keyBy('jenis'),
         ]);
     }
 

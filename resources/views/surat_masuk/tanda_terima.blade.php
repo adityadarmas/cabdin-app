@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tanda Terima Surat Masuk — {{ $suratMasuk->nomor_surat }}</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10pt;
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* ── toolbar (hanya layar) ── */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #1e293b;
+            color: #fff;
+            padding: 10px 20px;
+        }
+        .toolbar h1 { font-size: 14pt; font-weight: 700; flex: 1; }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 16px;
+            border-radius: 6px;
+            font-size: 10pt;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+        }
+        .btn-print  { background: #0ea5e9; color: #fff; }
+        .btn-back   { background: #475569; color: #fff; }
+        .btn:hover  { opacity: .88; }
+
+        /* ── wrapper ── */
+        .page-wrapper {
+            max-width: 780px;
+            margin: 24px auto;
+            padding: 0 16px 40px;
+        }
+
+        /* ── single receipt card ── */
+        .receipt {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px 24px 16px;
+            margin-bottom: 0;
+        }
+
+        /* header instansi */
+        .receipt-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            border-bottom: 2.5px solid #0f172a;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+        .receipt-header .logo-placeholder {
+            width: 52px;
+            height: 52px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22pt;
+            flex-shrink: 0;
+        }
+        .receipt-header .instansi-info { flex: 1; }
+        .receipt-header .instansi-name {
+            font-size: 12pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            line-height: 1.3;
+        }
+        .receipt-header .instansi-sub {
+            font-size: 8pt;
+            color: #64748b;
+            margin-top: 2px;
+        }
+
+        /* title */
+        .receipt-title {
+            text-align: center;
+            font-size: 11pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 14px;
+            color: #0f172a;
+        }
+
+        /* body: detail + qr side by side */
+        .receipt-body {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        .receipt-details { flex: 1; }
+
+        table.detail-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 9.5pt;
+        }
+        table.detail-table td {
+            padding: 3px 0;
+            vertical-align: top;
+        }
+        table.detail-table td:first-child {
+            width: 115px;
+            font-weight: 600;
+            color: #334155;
+            white-space: nowrap;
+        }
+        table.detail-table td:nth-child(2) {
+            width: 12px;
+            color: #94a3b8;
+        }
+
+        .qr-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .qr-section .qr-box {
+            width: 88px;
+            height: 88px;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+            overflow: hidden;
+        }
+        .qr-section .qr-label {
+            font-size: 7pt;
+            color: #64748b;
+            text-align: center;
+            line-height: 1.3;
+        }
+
+        /* status badge */
+        .status-badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-size: 8pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+        .status-diterima     { background: #dbeafe; color: #1d4ed8; }
+        .status-dikirim      { background: #fef9c3; color: #a16207; }
+        .status-disetujui    { background: #ede9fe; color: #6d28d9; }
+        .status-siap_diambil { background: #dcfce7; color: #166534; }
+        .status-disposisi    { background: #ccfbf1; color: #0f766e; }
+
+        /* signature area */
+        .signature-area {
+            display: flex;
+            gap: 24px;
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px dashed #cbd5e1;
+        }
+        .sig-box {
+            flex: 1;
+            text-align: center;
+        }
+        .sig-box .sig-title {
+            font-size: 8.5pt;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 46px;
+        }
+        .sig-box .sig-line {
+            border-top: 1px solid #334155;
+            font-size: 8pt;
+            color: #475569;
+            padding-top: 3px;
+        }
+
+        /* tracking note */
+        .tracking-note {
+            font-size: 7.5pt;
+            color: #64748b;
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px solid #f1f5f9;
+            word-break: break-all;
+        }
+
+        /* ── cut line ── */
+        .cut-line {
+            text-align: center;
+            color: #94a3b8;
+            font-size: 8.5pt;
+            letter-spacing: 3px;
+            padding: 10px 0;
+            position: relative;
+        }
+        .cut-line::before,
+        .cut-line::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 80px);
+            border-top: 1.5px dashed #cbd5e1;
+        }
+        .cut-line::before { left: 0; }
+        .cut-line::after  { right: 0; }
+
+        /* ── PRINT ── */
+        @media print {
+            @page {
+                size: A5;
+                margin: 8mm 10mm;
+            }
+            body { background: #fff; }
+            .toolbar { display: none !important; }
+            .page-wrapper {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .receipt {
+                border: 1px solid #94a3b8;
+                border-radius: 0;
+                padding: 12px 14px 10px;
+                break-inside: avoid;
+            }
+            .cut-line {
+                break-before: always;
+                padding: 4px 0;
+            }
+            .receipt-header .logo-placeholder { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+{{-- ── TOOLBAR ── --}}
+<div class="toolbar">
+    <h1>Tanda Terima Surat Masuk</h1>
+    <a href="{{ route('surat-masuk.index') }}" class="btn btn-back">← Kembali</a>
+    <button onclick="window.print()" class="btn btn-print">🖨️ Cetak</button>
+</div>
+
+<div class="page-wrapper">
+
+    @php
+        $asal         = $suratMasuk->asal ?: ($suratMasuk->tamu->nama ?? '-');
+        $tglTerima    = $suratMasuk->tgl_diterima ? $suratMasuk->tgl_diterima->translatedFormat('d F Y') : '-';
+        $trackingUrl  = $suratMasuk->tracking_url;
+        $statusLabels = [
+            'diterima'     => ['label' => 'Diterima',      'cls' => 'status-diterima'],
+            'dikirim'      => ['label' => 'Dikirim',       'cls' => 'status-dikirim'],
+            'disetujui'    => ['label' => 'Disetujui',     'cls' => 'status-disetujui'],
+            'siap_diambil' => ['label' => 'Siap Diambil',  'cls' => 'status-siap_diambil'],
+            'disposisi'    => ['label' => 'Disposisi',     'cls' => 'status-disposisi'],
+        ];
+        $st = $statusLabels[$suratMasuk->status] ?? ['label' => ucfirst($suratMasuk->status), 'cls' => ''];
+    @endphp
+
+    {{-- ── LEMBAR 1 (untuk pengirim / tamu) ── --}}
+    <div class="receipt" id="receipt-1">
+        <div class="receipt-header">
+            <div class="logo-placeholder">🏛️</div>
+            <div class="instansi-info">
+                <div class="instansi-name">Cabang Dinas Pendidikan</div>
+                <div class="instansi-sub">Kabupaten Malang — Provinsi Jawa Timur</div>
+            </div>
+        </div>
+
+        <div class="receipt-title">Tanda Terima Surat Masuk</div>
+
+        <div class="receipt-body">
+            <div class="receipt-details">
+                <table class="detail-table">
+                    <tr>
+                        <td>No. Agenda</td>
+                        <td>:</td>
+                        <td>{{ $suratMasuk->nomor_agenda ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>No. Surat</td>
+                        <td>:</td>
+                        <td><strong>{{ $suratMasuk->nomor_surat }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Perihal</td>
+                        <td>:</td>
+                        <td>{{ $suratMasuk->perihal ?: '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Dari / Pengirim</td>
+                        <td>:</td>
+                        <td>{{ $asal }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Surat</td>
+                        <td>:</td>
+                        <td>{{ $suratMasuk->tgl_surat ? $suratMasuk->tgl_surat->translatedFormat('d F Y') : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Diterima</td>
+                        <td>:</td>
+                        <td>{{ $tglTerima }}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>:</td>
+                        <td>
+                            <span class="status-badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            {{-- QR Code --}}
+            <div class="qr-section">
+                <div class="qr-box" id="qr1"></div>
+                <div class="qr-label">
+                    Scan untuk cek<br>status surat
+                </div>
+            </div>
+        </div>
+
+        <div class="signature-area">
+            <div class="sig-box">
+                <div class="sig-title">Penerima</div>
+                <div class="sig-line">( ........................... )</div>
+            </div>
+            <div class="sig-box">
+                <div class="sig-title">Pengirim / Pembawa Surat</div>
+                <div class="sig-line">( ........................... )</div>
+            </div>
+        </div>
+
+        @if($trackingUrl)
+        <div class="tracking-note">
+            🔗 Link tracking: {{ $trackingUrl }}
+        </div>
+        @endif
+    </div>
+
+    {{-- ── CUT LINE ── --}}
+    <div class="cut-line">✂ &nbsp; POTONG DI SINI &nbsp; ✂</div>
+
+    {{-- ── LEMBAR 2 (untuk arsip kantor) ── --}}
+    <div class="receipt" id="receipt-2">
+        <div class="receipt-header">
+            <div class="logo-placeholder">🏛️</div>
+            <div class="instansi-info">
+                <div class="instansi-name">Cabang Dinas Pendidikan</div>
+                <div class="instansi-sub">Kabupaten Malang — Provinsi Jawa Timur</div>
+            </div>
+        </div>
+
+        <div class="receipt-title">Tanda Terima Surat Masuk <span style="font-size:8pt;font-weight:400;color:#64748b;">(Arsip)</span></div>
+
+        <div class="receipt-body">
+            <div class="receipt-details">
+                <table class="detail-table">
+                    <tr>
+                        <td>No. Agenda</td>
+                        <td>:</td>
+                        <td>{{ $suratMasuk->nomor_agenda ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>No. Surat</td>
+                        <td>:</td>
+                        <td><strong>{{ $suratMasuk->nomor_surat }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Perihal</td>
+                        <td>:</td>
+                        <td>{{ $suratMasuk->perihal ?: '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Dari / Pengirim</td>
+                        <td>:</td>
+                        <td>{{ $asal }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Surat</td>
+                        <td>:</td>
+                        <td>{{ $suratMasuk->tgl_surat ? $suratMasuk->tgl_surat->translatedFormat('d F Y') : '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Tanggal Diterima</td>
+                        <td>:</td>
+                        <td>{{ $tglTerima }}</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td>:</td>
+                        <td>
+                            <span class="status-badge {{ $st['cls'] }}">{{ $st['label'] }}</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="qr-section">
+                <div class="qr-box" id="qr2"></div>
+                <div class="qr-label">
+                    Scan untuk cek<br>status surat
+                </div>
+            </div>
+        </div>
+
+        <div class="signature-area">
+            <div class="sig-box">
+                <div class="sig-title">Penerima</div>
+                <div class="sig-line">( ........................... )</div>
+            </div>
+            <div class="sig-box">
+                <div class="sig-title">Pengirim / Pembawa Surat</div>
+                <div class="sig-line">( ........................... )</div>
+            </div>
+        </div>
+
+        @if($trackingUrl)
+        <div class="tracking-note">
+            🔗 Link tracking: {{ $trackingUrl }}
+        </div>
+        @endif
+    </div>
+
+</div>{{-- end page-wrapper --}}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+    var trackingUrl = @json($trackingUrl ?? '');
+
+    function makeQR(elementId, url) {
+        var el = document.getElementById(elementId);
+        if (!el) return;
+        if (!url) {
+            el.innerHTML = '<span style="font-size:7pt;color:#94a3b8;text-align:center;padding:4px;">Tidak ada<br>link tracking</span>';
+            return;
+        }
+        new QRCode(el, {
+            text: url,
+            width: 80,
+            height: 80,
+            correctLevel: QRCode.CorrectLevel.M,
+        });
+    }
+
+    makeQR('qr1', trackingUrl);
+    makeQR('qr2', trackingUrl);
+</script>
+
+</body>
+</html>

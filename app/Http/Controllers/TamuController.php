@@ -31,15 +31,17 @@ class TamuController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'asal' => 'required|string|max:255',
-            'keperluan' => 'required|string|max:255',
+            'nama'     => 'required|string|max:255',
+            'asal'     => 'required|string|max:255',
+            'keperluan'=> 'required|string|max:255',
+            'nomor_hp' => 'nullable|string|max:20',
         ]);
 
         Tamu::create([
-            'nama' => $request->nama,
-            'asal' => $request->asal,
-            'keperluan' => $request->keperluan,
+            'nama'     => $request->nama,
+            'asal'     => $request->asal,
+            'keperluan'=> $request->keperluan,
+            'nomor_hp' => $request->nomor_hp,
         ]);
 
         return redirect()
@@ -61,15 +63,17 @@ class TamuController extends Controller
     public function update(Request $request, Tamu $tamu)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'asal' => 'required|string|max:255',
-            'keperluan' => 'required|string|max:255',
+            'nama'     => 'required|string|max:255',
+            'asal'     => 'required|string|max:255',
+            'keperluan'=> 'required|string|max:255',
+            'nomor_hp' => 'nullable|string|max:20',
         ]);
 
         $tamu->update([
-            'nama' => $request->nama,
-            'asal' => $request->asal,
-            'keperluan' => $request->keperluan,
+            'nama'     => $request->nama,
+            'asal'     => $request->asal,
+            'keperluan'=> $request->keperluan,
+            'nomor_hp' => $request->nomor_hp,
         ]);
 
         return redirect()

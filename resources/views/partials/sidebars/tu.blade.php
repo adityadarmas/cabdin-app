@@ -22,6 +22,15 @@
             </a>
         </li>
 
+        <!-- Surat Keluar -->
+        <li>
+            <a href="{{ route('surat-keluar.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('surat-keluar.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Nomor Surat Keluar
+            </a>
+        </li>
+
         <!-- DIVIDER -->
         <li class="border-t border-slate-700 my-4"></li>
 

@@ -70,6 +70,20 @@
                        focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">{{ old('keperluan', $tamu->keperluan) }}</textarea>
         </div>
 
+        <!-- NOMOR HP -->
+        <div>
+            <label class="block text-sm font-medium text-slate-700 mb-1">
+                Nomor HP / WhatsApp
+            </label>
+            <input
+                type="text"
+                name="nomor_hp"
+                value="{{ old('nomor_hp', $tamu->nomor_hp) }}"
+                placeholder="Contoh: 08123456789"
+                class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
+                       focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500">
+        </div>
+
         <!-- ACTION BUTTON -->
         <div class="flex justify-between items-center pt-4">
             <a href="{{ route('tamu.create') }}"

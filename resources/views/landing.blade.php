@@ -2,597 +2,876 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>E-Cabdin - Cabang Dinas Pendidikan Wilayah Kabupaten Malang</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Cabdin - Cabang Dinas Pendidikan</title>
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon.png') }}">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --navy: oklch(22% 0.06 250);
+            --navy-mid: oklch(30% 0.07 250);
+            --blue: oklch(45% 0.18 245);
+            --gold: oklch(68% 0.16 75);
+            --bg: oklch(98% 0.006 240);
+            --bg2: oklch(96% 0.008 240);
+            --text: oklch(16% 0.025 250);
+            --text-muted: oklch(50% 0.02 250);
+            --border: oklch(88% 0.012 240);
+            --white: #ffffff;
+            --ff: 'Plus Jakarta Sans', sans-serif;
+            --radius: 12px;
+            --radius-lg: 20px;
+        }
+        html { scroll-behavior: smooth; }
+        body { font-family: var(--ff); background: var(--bg); color: var(--text); line-height: 1.6; }
+        img { display: block; max-width: 100%; }
+        a { text-decoration: none; color: inherit; }
+        [x-cloak] { display: none !important; }
+
+        /* Scroll reveal */
+        .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s ease, transform 0.65s ease; }
+        .reveal.visible { opacity: 1; transform: none; }
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        /* Navbar */
+        .navbar {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 48px; height: 68px;
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border);
+            transition: box-shadow 0.3s;
+        }
+        .navbar.scrolled { box-shadow: 0 2px 24px oklch(22% 0.06 250 / 0.08); }
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
+        .nav-logo {
+            width: 40px; height: 40px; border-radius: 10px;
+            background: var(--navy); display: flex; align-items: center; justify-content: center;
+        }
+        .nav-logo svg { width: 22px; height: 22px; }
+        .nav-brand-text { display: flex; flex-direction: column; }
+        .nav-brand-title { font-size: 13px; font-weight: 700; color: var(--navy); line-height: 1.2; }
+        .nav-brand-sub { font-size: 10px; color: var(--text-muted); letter-spacing: 0.05em; }
+        .nav-links { display: flex; gap: 32px; }
+        .nav-links a { font-size: 13.5px; font-weight: 500; color: var(--text-muted); transition: color 0.2s; }
+        .nav-links a:hover { color: var(--blue); }
+        .nav-cta {
+            font-size: 13px; font-weight: 600; padding: 9px 22px;
+            background: var(--navy); color: var(--white); border-radius: 8px;
+            transition: background 0.2s, transform 0.15s;
+        }
+        .nav-cta:hover { background: var(--blue); transform: translateY(-1px); }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh; display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            padding: 100px 48px 60px;
+            gap: 60px;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: ''; position: absolute; top: -120px; right: -80px;
+            width: 560px; height: 560px; border-radius: 50%;
+            background: oklch(45% 0.18 245 / 0.06); pointer-events: none;
+        }
+        .hero::after {
+            content: ''; position: absolute; bottom: -80px; left: 200px;
+            width: 300px; height: 300px; border-radius: 50%;
+            background: oklch(68% 0.16 75 / 0.07); pointer-events: none;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 100px;
+            background: oklch(45% 0.18 245 / 0.08);
+            border: 1px solid oklch(45% 0.18 245 / 0.2);
+            font-size: 12px; font-weight: 600; color: var(--blue);
+            letter-spacing: 0.04em; margin-bottom: 24px;
+        }
+        .hero-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); }
+        .hero-title {
+            font-size: clamp(36px, 4.5vw, 58px);
+            font-weight: 800; line-height: 1.12;
+            color: var(--navy); letter-spacing: -0.02em; margin-bottom: 20px;
+        }
+        .hero-title span { color: var(--blue); }
+        .hero-desc { font-size: 16px; color: var(--text-muted); line-height: 1.75; max-width: 480px; margin-bottom: 36px; }
+        .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+        .btn-primary {
+            padding: 14px 28px; border-radius: 10px;
+            background: var(--navy); color: var(--white);
+            font-size: 14px; font-weight: 600;
+            transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        .btn-primary:hover { background: var(--blue); transform: translateY(-2px); box-shadow: 0 8px 24px oklch(45% 0.18 245 / 0.25); }
+        .btn-outline {
+            padding: 14px 28px; border-radius: 10px;
+            border: 1.5px solid var(--border); background: transparent;
+            font-size: 14px; font-weight: 600; color: var(--text);
+            transition: border-color 0.2s, transform 0.15s; display: inline-block;
+        }
+        .btn-outline:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); }
+        .hero-stats { display: flex; gap: 32px; margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+        .stat-item { display: flex; flex-direction: column; }
+        .stat-num { font-size: 28px; font-weight: 800; color: var(--navy); letter-spacing: -0.03em; }
+        .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+        .hero-visual { position: relative; }
+        .hero-img-wrap {
+            aspect-ratio: 4/3.2;
+            background: linear-gradient(135deg, oklch(22% 0.06 250), oklch(30% 0.09 245));
+            border-radius: var(--radius-lg); overflow: hidden; position: relative;
+            box-shadow: 0 32px 80px oklch(22% 0.06 250 / 0.22);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .hero-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 40px; opacity: 0.9; }
+
+        /* Section common */
+        .section { padding: 96px 48px; }
+        .section-alt { background: var(--bg2); }
+        .section-header { text-align: center; max-width: 600px; margin: 0 auto 64px; }
+        .section-eyebrow {
+            display: inline-block; font-size: 11px; font-weight: 700;
+            letter-spacing: 0.12em; text-transform: uppercase;
+            color: var(--blue); margin-bottom: 14px;
+        }
+        .section-title { font-size: clamp(28px, 3.5vw, 40px); font-weight: 800; color: var(--navy); letter-spacing: -0.02em; line-height: 1.2; margin-bottom: 16px; }
+        .section-desc { font-size: 15px; color: var(--text-muted); line-height: 1.75; }
+
+        /* Layanan */
+        .layanan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
+        .layanan-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 36px 28px;
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+            position: relative; overflow: hidden;
+        }
+        .layanan-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: var(--blue); transform: scaleX(0); transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+        .layanan-card:hover { transform: translateY(-5px); box-shadow: 0 20px 50px oklch(22% 0.06 250 / 0.1); border-color: transparent; }
+        .layanan-card:hover::before { transform: scaleX(1); }
+        .layanan-icon {
+            width: 52px; height: 52px; border-radius: 14px;
+            background: oklch(45% 0.18 245 / 0.1);
+            display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+        }
+        .layanan-icon svg { width: 24px; height: 24px; stroke: var(--blue); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+        .layanan-name { font-size: 17px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+        .layanan-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.7; }
+
+        /* Produk */
+        .produk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; max-width: 1100px; margin: 0 auto; }
+        .produk-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); overflow: hidden;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .produk-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px oklch(22% 0.06 250 / 0.09); }
+        .produk-thumb {
+            aspect-ratio: 3/2;
+            background: linear-gradient(135deg, var(--bg2), var(--border));
+            position: relative; overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .produk-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .produk-thumb-placeholder {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            font-size: 10px; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase;
+        }
+        .produk-tag {
+            position: absolute; top: 10px; left: 10px;
+            font-size: 10px; font-weight: 700; letter-spacing: 0.06em;
+            padding: 4px 10px; border-radius: 100px;
+            background: var(--navy); color: var(--white);
+        }
+        .produk-body { padding: 18px; }
+        .produk-name { font-size: 14px; font-weight: 700; color: var(--navy); margin-bottom: 6px; line-height: 1.3; }
+        .produk-school { font-size: 11.5px; color: var(--text-muted); margin-bottom: 4px; }
+        .produk-price { font-size: 14px; font-weight: 700; color: var(--blue); }
+
+        /* Prosedur */
+        .prosedur-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 40px; }
+        .prosedur-tab {
+            padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600;
+            border: 1.5px solid var(--border); background: var(--white);
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+        }
+        .prosedur-tab-active { background: var(--blue); border-color: var(--blue); color: var(--white); }
+        .prosedur-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1100px; margin: 0 auto; }
+        .prosedur-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 28px;
+            display: flex; flex-direction: column;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+        .prosedur-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px oklch(22% 0.06 250 / 0.09); }
+        .prosedur-num {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--blue); color: var(--white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; margin-bottom: 16px;
+        }
+        .prosedur-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+        .prosedur-desc { font-size: 13px; color: var(--text-muted); line-height: 1.7; flex: 1; }
+        .prosedur-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--blue); }
+
+        /* Dapodik */
+        .dapodik-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 1100px; margin: 0 auto 32px; }
+        .dapodik-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; }
+        .dapodik-label { font-size: 11px; font-weight: 700; color: var(--blue); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+        .dapodik-title { font-size: 15px; font-weight: 700; color: var(--navy); margin-bottom: 12px; }
+        .dapodik-row { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+
+        /* Berita */
+        .berita-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 24px; max-width: 1100px; margin: 0 auto; }
+        .berita-featured {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); overflow: hidden; transition: box-shadow 0.25s;
+        }
+        .berita-featured:hover { box-shadow: 0 16px 40px oklch(22% 0.06 250 / 0.08); }
+        .berita-featured-img {
+            aspect-ratio: 16/8;
+            background: linear-gradient(145deg, oklch(22% 0.06 250), oklch(42% 0.14 245));
+            overflow: hidden; display: flex; align-items: center; justify-content: center;
+        }
+        .berita-featured-img img { width: 100%; height: 100%; object-fit: cover; }
+        .berita-featured-body { padding: 28px; }
+        .berita-cat { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--blue); margin-bottom: 10px; }
+        .berita-featured-title { font-size: 20px; font-weight: 700; color: var(--navy); line-height: 1.3; margin-bottom: 12px; }
+        .berita-featured-desc { font-size: 13.5px; color: var(--text-muted); line-height: 1.7; }
+        .berita-meta { display: flex; align-items: center; gap: 16px; margin-top: 20px; font-size: 12px; color: var(--text-muted); }
+        .berita-read-more { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--blue); transition: gap 0.2s; }
+        .berita-read-more:hover { gap: 10px; }
+        .berita-list { display: flex; flex-direction: column; gap: 14px; }
+        .berita-item {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 18px 20px;
+            display: flex; gap: 16px; align-items: flex-start;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .berita-item:hover { transform: translateX(4px); box-shadow: 0 6px 20px oklch(22% 0.06 250 / 0.07); }
+        .berita-item-num { font-size: 26px; font-weight: 800; color: var(--border); min-width: 32px; line-height: 1; }
+        .berita-item-content { flex: 1; }
+        .berita-item-title { font-size: 13.5px; font-weight: 600; color: var(--navy); line-height: 1.4; margin-bottom: 6px; }
+        .berita-item-date { font-size: 11px; color: var(--text-muted); }
+
+        /* Org / Staff */
+        .org-wrap { max-width: 900px; margin: 0 auto; }
+        .org-level { display: flex; justify-content: center; }
+        .org-connector-line { width: 2px; height: 32px; background: var(--border); margin: 0 auto; }
+        .org-node {
+            background: var(--white); border: 1.5px solid var(--border);
+            border-radius: 12px; padding: 16px 22px; text-align: center;
+            min-width: 160px; max-width: 200px;
+            transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+        }
+        .org-node:hover { transform: translateY(-3px); box-shadow: 0 10px 28px oklch(22% 0.06 250 / 0.1); border-color: var(--blue); }
+        .org-node.head { background: var(--navy); border-color: var(--navy); min-width: 230px; max-width: 280px; }
+        .org-node.head .org-node-name { color: var(--white); }
+        .org-node.head .org-node-role { color: oklch(75% 0.04 240); }
+        .org-node.deputy { background: oklch(45% 0.18 245 / 0.08); border-color: oklch(45% 0.18 245 / 0.35); }
+        .org-node.deputy .org-node-name { color: var(--blue); }
+        .org-node-avatar {
+            width: 44px; height: 44px; border-radius: 50%; margin: 0 auto 10px;
+            background: var(--bg2); border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; font-weight: 700; color: var(--text-muted);
+        }
+        .org-node.head .org-node-avatar { background: oklch(100% 0 0 / 0.12); border-color: oklch(100% 0 0 / 0.2); color: var(--white); }
+        .org-node-name { font-size: 13px; font-weight: 700; color: var(--navy); line-height: 1.3; margin-bottom: 4px; }
+        .org-node-role { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+        .org-children { display: flex; gap: 12px; justify-content: center; padding-top: 24px; }
+
+        .staff-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 48px 0 32px; }
+        .staff-tab {
+            padding: 8px 20px; border-radius: 100px; font-size: 13px; font-weight: 600;
+            border: 1.5px solid var(--border); background: var(--white);
+            color: var(--text-muted); cursor: pointer; transition: all 0.2s;
+        }
+        .staff-tab-active { background: var(--navy); border-color: var(--navy); color: var(--white); }
+        .staff-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 900px; margin: 0 auto; }
+        .staff-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: var(--radius); padding: 16px 20px;
+            display: flex; align-items: center; gap: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .staff-card:hover { transform: translateX(4px); box-shadow: 0 6px 20px oklch(22% 0.06 250 / 0.07); }
+        .staff-avatar {
+            width: 44px; height: 44px; border-radius: 12px;
+            background: var(--blue); color: var(--white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
+        }
+        .staff-role { font-size: 11px; color: var(--blue); font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 2px; }
+        .staff-name { font-size: 13px; font-weight: 700; color: var(--navy); line-height: 1.3; margin-bottom: 2px; }
+        .staff-nip { font-size: 11px; color: var(--text-muted); }
+
+        /* Footer */
+        footer { background: var(--navy); color: oklch(80% 0.03 240); padding: 64px 48px 32px; }
+        .footer-top { display: grid; grid-template-columns: 1.8fr 1fr 1fr 1fr; gap: 48px; padding-bottom: 48px; border-bottom: 1px solid oklch(100% 0 0 / 0.1); }
+        .footer-brand { display: flex; flex-direction: column; gap: 16px; }
+        .footer-logo { width: 44px; height: 44px; border-radius: 10px; background: oklch(100% 0 0 / 0.1); display: flex; align-items: center; justify-content: center; }
+        .footer-name { font-size: 15px; font-weight: 700; color: var(--white); line-height: 1.3; }
+        .footer-tagline { font-size: 13px; color: oklch(70% 0.03 240); line-height: 1.6; }
+        .footer-contact { margin-top: 4px; display: flex; flex-direction: column; gap: 8px; }
+        .footer-contact-item { font-size: 12.5px; display: flex; align-items: flex-start; gap: 8px; color: oklch(70% 0.03 240); }
+        .footer-contact-item svg { flex-shrink: 0; margin-top: 2px; }
+        .footer-col-title { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--white); margin-bottom: 18px; }
+        .footer-links { display: flex; flex-direction: column; gap: 11px; }
+        .footer-links a { font-size: 13px; color: oklch(70% 0.03 240); transition: color 0.2s; }
+        .footer-links a:hover { color: var(--gold); }
+        .footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 28px; }
+        .footer-copy { font-size: 12px; color: oklch(55% 0.03 240); }
+
+        @media (max-width: 900px) {
+            .navbar { padding: 0 20px; }
+            .nav-links { display: none; }
+            .hero { grid-template-columns: 1fr; padding: 100px 20px 48px; }
+            .hero-visual { display: none; }
+            .section { padding: 64px 20px; }
+            .layanan-grid, .prosedur-grid { grid-template-columns: 1fr; }
+            .produk-grid { grid-template-columns: repeat(2, 1fr); }
+            .dapodik-grid { grid-template-columns: 1fr; }
+            .berita-grid { grid-template-columns: 1fr; }
+            .staff-grid { grid-template-columns: 1fr; }
+            .footer-top { grid-template-columns: 1fr 1fr; gap: 28px; }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+        }
+    </style>
 </head>
+<body>
 
-<body class="bg-gradient-to-br from-sky-50 via-blue-50 to-sky-100 text-slate-800 scroll-smooth">
-
-<!-- HEADER -->
-<header id="main-header" class="sticky top-0 z-50 bg-white/80 backdrop-blur-md transition-all duration-300 border-b border-sky-100">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-lg flex items-center justify-center">
-                <span class="text-white font-bold text-lg">E</span>
-            </div>
-            <span class="text-xl font-bold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent">E-CABDIN</span>
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+    <div class="nav-brand">
+        <div class="nav-logo">
+            <svg viewBox="0 0 22 22" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M11 2L2 7l9 5 9-5-9-5z"/>
+                <path d="M2 12l9 5 9-5"/>
+                <path d="M2 17l9 5 9-5"/>
+            </svg>
         </div>
-        <nav class="hidden md:flex items-center gap-8">
-            <a href="#profil" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">
-                Profil
-            </a>
-            <a href="#produk" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">
-                Produk
-            </a>
-            <a href="#prosedur" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">
-                Prosedur
-            </a>
-            <a href="#berita" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">
-                Berita
-            </a>
-            <a href="#staff" class="text-sm font-medium text-slate-600 hover:text-sky-600 transition-colors">
-                Staff
-            </a>
-        </nav>
-        <a href="{{ route('login') }}" class="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 text-sm font-medium">
-            Masuk
-        </a>
+        <div class="nav-brand-text">
+            <span class="nav-brand-title">E-Cabdin Pendidikan</span>
+            <span class="nav-brand-sub">Kab. Malang · Jawa Timur</span>
+        </div>
     </div>
-</header>
+    <div class="nav-links">
+        <a href="#layanan">Layanan</a>
+        <a href="#produk">Produk</a>
+        <a href="#prosedur">Prosedur</a>
+        <a href="#berita">Berita</a>
+        <a href="#staff">Staff</a>
+    </div>
+    <a href="{{ route('login') }}" class="nav-cta">Masuk</a>
+</nav>
 
-<main class="max-w-6xl mx-auto px-6 py-12 space-y-20">
-
-    <!-- HERO SECTION / PROFIL INSTANSI -->
-    <section id="profil" class="scroll-mt-24 min-h-[70vh] flex flex-col md:flex-row items-center gap-12">
-        <div class="flex-1 space-y-6">
-            <div class="inline-block px-4 py-2 bg-sky-100 text-sky-700 rounded-full text-sm font-medium">
-                Pemerintah Provinsi Jawa Timur
-            </div>
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900 leading-tight">
-                Cabang Dinas Pendidikan Provinsi Jawa Timur
-            </h1>
-            <h2 class="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-sky-600 to-blue-600 bg-clip-text text-transparent leading-tight">
-                Wilayah Kabupaten Malang
-            </h2>
-            <p class="text-lg text-slate-600 max-w-xl leading-relaxed">
-                Kami melayani administrasi pendidikan menengah atas di wilayah Kabupaten Malang secara digital dan terintegrasi untuk kemajuan pendidikan Indonesia.
-            </p>
-            <div class="flex gap-4 pt-4">
-                <a href="#produk" class="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-8 py-3 rounded-full hover:shadow-xl hover:scale-105 transition-all duration-300 font-medium">
-                    Jelajahi Produk
-                </a>
-                <a href="#staff" class="bg-white text-sky-600 border-2 border-sky-200 px-8 py-3 rounded-full hover:bg-sky-50 transition-all duration-300 font-medium">
-                    Lihat Tim Kami
-                </a>
-            </div>
+<!-- HERO -->
+<section class="hero" id="hero">
+    <div class="hero-content">
+        <div class="hero-badge reveal">
+            Pemerintah Provinsi Jawa Timur
         </div>
-
-        <div class="flex-1 flex justify-center">
-            <div class="relative">
-                <div class="absolute inset-0 bg-gradient-to-br from-sky-400 to-blue-600 rounded-3xl blur-3xl opacity-20"></div>
-                <img src="/images/jatim.png"
-                     alt="Logo Provinsi Jawa Timur"
-                     class="relative h-80 w-auto drop-shadow-2xl">
-            </div>
-        </div>
-    </section>
-
-<!-- PRODUK SECTION -->
-<section id="produk" class="scroll-mt-24">
-    <div class="text-center mb-12">
-        <h3 class="text-4xl font-bold text-slate-900 mb-3">
-            Produk Unggulan
-        </h3>
-        <p class="text-lg text-slate-600">
-            Hasil karya terbaik dari sekolah-sekolah di Kabupaten Malang
+        <h1 class="hero-title reveal reveal-delay-1">
+            Mendidik<br/><span>Generasi</span><br/>Unggul Bangsa
+        </h1>
+        <p class="hero-desc reveal reveal-delay-2">
+            Cabang Dinas Pendidikan Provinsi Jawa Timur Wilayah Kabupaten Malang berkomitmen memberikan layanan pendidikan berkualitas, transparan, dan berorientasi pada kemajuan peserta didik.
         </p>
+        <div class="hero-actions reveal reveal-delay-3">
+            <a href="#produk" class="btn-primary">Jelajahi Produk</a>
+            <a href="#prosedur" class="btn-outline">Panduan Layanan</a>
+        </div>
+        <div class="hero-stats reveal reveal-delay-4">
+            <div class="stat-item">
+                <span class="stat-num">{{ $produk->count() }}+</span>
+                <span class="stat-label">Produk Aktif</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ $berita->count() }}+</span>
+                <span class="stat-label">Berita Terkini</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-num">{{ $kategoriProsedur->sum(fn($k) => $k->prosedursAktif->count()) }}</span>
+                <span class="stat-label">Prosedur Layanan</span>
+            </div>
+        </div>
     </div>
+    <div class="hero-visual reveal reveal-delay-2">
+        <div class="hero-img-wrap">
+            <img src="/images/jatim.png" alt="Logo Provinsi Jawa Timur">
+        </div>
+    </div>
+</section>
 
-    <div class="space-y-8">
+<!-- LAYANAN -->
+<section class="section" id="layanan">
+    <div class="section-header">
+        <span class="section-eyebrow reveal">Layanan Kami</span>
+        <h2 class="section-title reveal reveal-delay-1">Pelayanan Publik<br/>yang Transparan</h2>
+        <p class="section-desc reveal reveal-delay-2">Kami menyediakan berbagai layanan administrasi dan teknis pendidikan untuk sekolah, guru, dan masyarakat di wilayah kami.</p>
+    </div>
+    <div class="layanan-grid">
+        <div class="layanan-card reveal reveal-delay-1">
+            <div class="layanan-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div class="layanan-name">Perizinan Sekolah</div>
+            <div class="layanan-desc">Pengurusan izin operasional, izin mendirikan bangunan sekolah, dan sertifikasi lembaga pendidikan formal.</div>
+        </div>
+        <div class="layanan-card reveal reveal-delay-2">
+            <div class="layanan-icon">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/><path d="M15 11l2 2 4-4"/></svg>
+            </div>
+            <div class="layanan-name">Sertifikasi Guru</div>
+            <div class="layanan-desc">Program peningkatan kompetensi dan sertifikasi profesi bagi tenaga pendidik SMA/SMK/SLB se-wilayah.</div>
+        </div>
+        <div class="layanan-card reveal reveal-delay-3">
+            <div class="layanan-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div class="layanan-name">Bantuan Siswa</div>
+            <div class="layanan-desc">Penyaluran PIP, beasiswa prestasi, dan bantuan operasional untuk mendukung akses pendidikan merata.</div>
+        </div>
+        <div class="layanan-card reveal reveal-delay-1">
+            <div class="layanan-icon">
+                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            </div>
+            <div class="layanan-name">Data Pendidikan</div>
+            <div class="layanan-desc">Pengelolaan data pokok pendidikan (Dapodik), statistik sekolah, dan laporan kinerja lembaga.</div>
+        </div>
+        <div class="layanan-card reveal reveal-delay-2">
+            <div class="layanan-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/><circle cx="18" cy="18" r="3"/><path d="M18 16v2l1 1"/></svg>
+            </div>
+            <div class="layanan-name">Kurikulum &amp; Mutu</div>
+            <div class="layanan-desc">Pembinaan implementasi Kurikulum Merdeka, supervisi mutu pembelajaran, dan evaluasi standar nasional.</div>
+        </div>
+        <div class="layanan-card reveal reveal-delay-3">
+            <div class="layanan-icon">
+                <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            </div>
+            <div class="layanan-name">Pengaduan &amp; Aspirasi</div>
+            <div class="layanan-desc">Layanan pengaduan masyarakat, aspirasi komunitas pendidikan, dan tindak lanjut permasalahan lapangan.</div>
+        </div>
+    </div>
+</section>
 
-        @foreach ($produk->take(3) as $index => $item)
-        <div class="bg-white rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-sky-100">
+<!-- PRODUK -->
+<section class="section section-alt" id="produk">
+    <div class="section-header">
+        <span class="section-eyebrow reveal">Produk</span>
+        <h2 class="section-title reveal reveal-delay-1">Produk &amp;<br/>Karya Sekolah</h2>
+        <p class="section-desc reveal reveal-delay-2">Produk terbaik dari sekolah-sekolah di wilayah Kabupaten Malang.</p>
+    </div>
+    @if($produk->count() > 0)
+    <div class="produk-grid">
+        @foreach($produk->take(8) as $item)
+        <a href="{{ route('produk.allindex') }}" class="produk-card reveal reveal-delay-{{ ($loop->index % 4) + 1 }}">
+            <div class="produk-thumb">
+                @if($item->gambar)
+                    <img src="{{ asset('storage/'.$item->gambar) }}" alt="{{ $item->nama }}">
+                @else
+                    <div class="produk-thumb-placeholder">
+                        <svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="1.2" width="28" height="28" style="opacity:0.3">
+                            <rect x="6" y="2" width="24" height="36" rx="3"/>
+                            <path d="M12 12h16M12 18h16M12 24h10"/>
+                        </svg>
+                        produk sekolah
+                    </div>
+                @endif
+                <span class="produk-tag">{{ $item->kategori ?? 'Produk' }}</span>
+            </div>
+            <div class="produk-body">
+                <div class="produk-name">{{ $item->nama }}</div>
+                @if($item->nama_sekolah ?? false)
+                <div class="produk-school">{{ $item->nama_sekolah }}</div>
+                @endif
+                <div class="produk-price">Rp {{ number_format($item->harga, 0, ',', '.') }}</div>
+            </div>
+        </a>
+        @endforeach
+    </div>
+    @if($produk->count() > 8)
+    <div style="text-align:center; margin-top:40px;">
+        <a href="{{ route('produk.allindex') }}" class="btn-outline">Lihat Semua Produk &rarr;</a>
+    </div>
+    @endif
+    @else
+    <p style="text-align:center; color:var(--text-muted); padding:60px 0;">Belum ada produk yang tersedia.</p>
+    @endif
+</section>
 
-            <div class="flex flex-col 
-                {{ $index % 2 == 0 ? 'md:flex-row' : 'md:flex-row-reverse' }} 
-                items-center gap-8">
+<!-- PROSEDUR -->
+<section class="section" id="prosedur">
+    <div class="section-header">
+        <span class="section-eyebrow reveal">Panduan</span>
+        <h2 class="section-title reveal reveal-delay-1">Prosedur<br/>Pelayanan</h2>
+        <p class="section-desc reveal reveal-delay-2">Panduan lengkap untuk mengakses layanan kami dengan mudah dan transparan.</p>
+    </div>
+    @if($kategoriProsedur->isNotEmpty())
+    <div x-data="{ activeTab: {{ $kategoriProsedur->first()->id ?? 0 }} }">
+        <div class="prosedur-tabs">
+            @foreach($kategoriProsedur as $kat)
+            <button
+                class="prosedur-tab"
+                :class="activeTab === {{ $kat->id }} ? 'prosedur-tab-active' : ''"
+                @click="activeTab = {{ $kat->id }}">
+                {{ $kat->nama }}
+            </button>
+            @endforeach
+        </div>
 
-                <!-- Gambar -->
-                <div class="w-48 h-48 bg-gradient-to-br from-sky-100 to-blue-100 rounded-2xl flex items-center justify-center flex-shrink-0">
-                    @if($item->gambar)
-                        <img src="{{ asset('storage/'.$item->gambar) }}"
-                             alt="{{ $item->nama }}"
-                             class="w-40 h-40 object-contain">
+        @foreach($kategoriProsedur as $kat)
+        <div
+            x-show="activeTab === {{ $kat->id }}"
+            x-transition:enter="transition ease-out duration-200"
+            x-transition:enter-start="opacity-0 translate-y-2"
+            x-transition:enter-end="opacity-100 translate-y-0"
+            x-cloak>
+
+            @if(str_contains(strtolower($kat->nama), 'dapodik'))
+            <div class="dapodik-grid">
+                @foreach(['edit_ptk' => 'Edit PTK', 'tambah_ptk' => 'Tambah PTK'] as $jenis => $label)
+                @php $jadwal = $dapodikJadwals[$jenis] ?? null; @endphp
+                <div class="dapodik-card">
+                    <div class="dapodik-label">Jadwal Dapodik</div>
+                    <div class="dapodik-title">{{ $label }}</div>
+                    @if($jadwal && ($jadwal->tanggal_mulai || $jadwal->tanggal_selesai))
+                        @if($jadwal->tanggal_mulai)
+                        <div class="dapodik-row">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>Mulai:</span>
+                            <strong style="color:var(--text)">{{ $jadwal->tanggal_mulai->translatedFormat('d F Y') }}</strong>
+                        </div>
+                        @endif
+                        @if($jadwal->tanggal_selesai)
+                        <div class="dapodik-row">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="1.5" width="14" height="14" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            <span>Selesai:</span>
+                            <strong style="color:var(--text)">{{ $jadwal->tanggal_selesai->translatedFormat('d F Y') }}</strong>
+                        </div>
+                        @endif
+                        @if($jadwal->keterangan)
+                        <p style="font-size:12px; color:var(--text-muted); font-style:italic; margin-top:8px;">{{ $jadwal->keterangan }}</p>
+                        @endif
                     @else
-                        <img src="/images/default-product.png" class="w-40 h-40 object-contain">
+                        <p style="font-size:13px; color:var(--text-muted); font-style:italic;">Jadwal belum tersedia.</p>
                     @endif
                 </div>
-
-                <!-- Konten -->
-                <div class="flex-1 space-y-3 {{ $index % 2 == 0 ? '' : 'text-left md:text-right' }}">
-                    
-                    <!-- Label Sekolah (dummy dulu) -->
-                    <div class="inline-block px-3 py-1 bg-sky-100 text-sky-700 rounded-full text-xs font-semibold">
-                        Produk Sekolah
-                    </div>
-
-                    <!-- Nama Produk -->
-                    <h4 class="text-3xl md:text-4xl font-bold text-slate-900">
-                        {{ $item->nama }}
-                    </h4>
-
-                    <!-- Deskripsi -->
-                    <p class="text-slate-600">
-                        {{ $item->deskripsi }}
-                    </p>
-
-                    <!-- Harga + Button -->
-                    <div class="flex items-center gap-4 pt-2 
-                        {{ $index % 2 == 0 ? '' : 'justify-start md:justify-end' }}">
-
-                        @if($index % 2 == 0)
-                            <button class="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2.5 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
-                                Lihat Detail
-                            </button>
-                        @endif
-
-                        <span class="text-2xl font-bold text-sky-600">
-                            Rp {{ number_format($item->harga,0,',','.') }}
-                        </span>
-
-                        @if($index % 2 == 1)
-                            <button class="bg-gradient-to-r from-blue-500 to-sky-600 text-white px-6 py-2.5 rounded-full hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
-                                Lihat Detail
-                            </button>
-                        @endif
-                    </div>
-
-                </div>
+                @endforeach
             </div>
+            @endif
+
+            @if($kat->prosedursAktif->isNotEmpty())
+            <div class="prosedur-grid">
+                @foreach($kat->prosedursAktif as $i => $item)
+                <a href="{{ route('prosedur.show', $item->id) }}" class="prosedur-card">
+                    <div class="prosedur-num">{{ $i + 1 }}</div>
+                    <div class="prosedur-title">{{ $item->judul }}</div>
+                    <div class="prosedur-desc">{{ $item->deskripsi }}</div>
+                    <div class="prosedur-link">Selengkapnya &rarr;</div>
+                </a>
+                @endforeach
+            </div>
+            @else
+            <p style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada prosedur dalam kategori ini.</p>
+            @endif
         </div>
         @endforeach
-
-        @if($produk->count() == 0)
-        <div class="text-center text-gray-500 bg-white p-8 rounded-xl shadow">
-            Belum ada produk yang tersedia.
-        </div>
-        @endif
-
-        <a href="{{ route('produk.allindex') }}"
-        class="bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2.5 rounded-full
-            hover:shadow-lg hover:scale-105 transition-all duration-300 font-medium">
-        Lihat Semua Produk
-        </a>
-
     </div>
-        
+    @else
+    <p style="text-align:center; color:var(--text-muted); padding:40px 0;">Prosedur belum tersedia.</p>
+    @endif
+</section>
 
-    <section id="prosedur" class="scroll-mt-24">
-        <div class="text-center mb-12">
-            <h3 class="text-4xl font-bold text-slate-900 mb-3">
-                Prosedur Pelayanan
-            </h3>
-            <p class="text-lg text-slate-600">
-                Panduan lengkap untuk mengakses layanan kami
-            </p>
-        </div>
-
-        <div
-            x-data="{
-                index: 0,
-                total: {{ $prosedur->count() }},
-                timer: null,
-
-                start() {
-                    this.stop()
-                    this.timer = setInterval(() => {
-                        this.next()
-                    }, 4000)
-                },
-
-                stop() {
-                    if (this.timer) {
-                        clearInterval(this.timer)
-                        this.timer = null
-                    }
-                },
-
-                next() {
-                    this.index = this.index < this.total - 1 ? this.index + 1 : 0
-                },
-
-                prev() {
-                    this.index = this.index > 0 ? this.index - 1 : this.total - 1
-                }
-            }"
-            x-init="start()"
-            @mouseenter="stop()"
-            @mouseleave="start()"
-            class="relative max-w-4xl mx-auto"
-        >
-            <!-- SLIDER -->
-            <div class="overflow-hidden">
-                <div 
-                    class="flex transition-transform duration-500"
-                    :style="`transform: translateX(-${index * 100}%)`"
-                >
-                    @foreach($prosedur as $i => $item)
-                    <div class="min-w-full md:min-w-1/3 px-3">
-                        <a href="{{ route('prosedur.show', $item->id) }}"
-                        class="block bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl
-                                transition-all duration-300 border border-sky-100 hover:border-sky-300">
-
-                            <div class="w-12 h-12 bg-gradient-to-br from-sky-400 to-blue-600
-                                        rounded-xl flex items-center justify-center mb-4">
-                                <span class="text-white font-bold text-xl">
-                                    {{ $i + 1 }}
-                                </span>
-                            </div>
-
-                            <h4 class="text-xl font-bold text-slate-900 mb-2">
-                                {{ $item->judul }}
-                            </h4>
-
-                            <p class="text-slate-600 line-clamp-3">
-                                {{ $item->deskripsi }}
-                            </p>
-
-                            <span class="inline-block mt-4 text-sky-600 font-semibold">
-                                Baca Selengkapnya →
-                            </span>
-                        </a>
-                    </div>
-                    @endforeach
-                </div>
+<!-- BERITA -->
+<section class="section section-alt" id="berita">
+    <div class="section-header">
+        <span class="section-eyebrow reveal">Berita</span>
+        <h2 class="section-title reveal reveal-delay-1">Informasi &amp;<br/>Pengumuman Terkini</h2>
+        <p class="section-desc reveal reveal-delay-2">Ikuti perkembangan terbaru kegiatan, agenda, dan pengumuman resmi dari Cabang Dinas Pendidikan.</p>
+    </div>
+    @if($berita->count() > 0)
+    @php $featured = $berita->first(); $others = $berita->skip(1)->take(4); @endphp
+    <div class="berita-grid">
+        <a href="{{ route('berita.show', $featured->id) }}" class="berita-featured reveal">
+            <div class="berita-featured-img">
+                @if($featured->thumbnail)
+                    <img src="{{ asset('storage/'.$featured->thumbnail) }}" alt="{{ $featured->judul }}">
+                @else
+                    <svg viewBox="0 0 40 40" fill="none" stroke="white" stroke-width="1.2" width="36" height="36" style="opacity:0.25">
+                        <rect x="4" y="4" width="32" height="32" rx="4"/><circle cx="14" cy="14" r="4"/><path d="M4 28l8-8 6 6 5-5 13 9"/>
+                    </svg>
+                @endif
             </div>
+            <div class="berita-featured-body">
+                <span class="berita-cat">Utama</span>
+                <h3 class="berita-featured-title">{{ $featured->judul }}</h3>
+                <p class="berita-featured-desc">{{ Str::limit(strip_tags($featured->konten), 180) }}</p>
+                <div class="berita-meta">
+                    <span>{{ \Carbon\Carbon::parse($featured->tanggal)->translatedFormat('d M Y') }}</span>
+                    <span>&middot;</span>
+                    <span>Admin Cabdin</span>
+                </div>
+                <div class="berita-read-more">Baca Selengkapnya &rarr;</div>
+            </div>
+        </a>
+        <div class="berita-list">
+            @foreach($others as $item)
+            <a href="{{ route('berita.show', $item->id) }}" class="berita-item reveal reveal-delay-{{ $loop->iteration }}">
+                <div class="berita-item-num">0{{ $loop->iteration }}</div>
+                <div class="berita-item-content">
+                    <div class="berita-item-title">{{ $item->judul }}</div>
+                    <div class="berita-item-date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d M Y') }}</div>
+                </div>
+            </a>
+            @endforeach
+        </div>
+    </div>
+    @else
+    <p style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada berita yang tersedia.</p>
+    @endif
+</section>
 
-            <!-- NAVIGATION -->
-            <div class="flex justify-center gap-4 mt-6">
-                <button
-                    @click="index = Math.max(index - 1, 0)"
-                    class="px-4 py-2 bg-sky-100 rounded-full hover:bg-sky-200">
-                    ‹
-                </button>
+<!-- STRUKTUR ORGANISASI -->
+<section class="section" id="staff">
+    <div class="section-header">
+        <span class="section-eyebrow reveal">Organisasi</span>
+        <h2 class="section-title reveal reveal-delay-1">Struktur<br/>Organisasi</h2>
+        <p class="section-desc reveal reveal-delay-2">Susunan pejabat dan unit kerja Cabang Dinas Pendidikan Provinsi Jawa Timur Wilayah Kabupaten Malang.</p>
+    </div>
 
-                <button
-                    @click="index = Math.min(index + 1, total - 1)"
-                    class="px-4 py-2 bg-sky-100 rounded-full hover:bg-sky-200">
-                    ›
-                </button>
+    <div class="org-wrap reveal reveal-delay-1">
+        <div class="org-level">
+            <div class="org-node deputy">
+                <div class="org-node-avatar">DA</div>
+                <div class="org-node-name">Dwi Anggraeni, S.Pd. M.Pd.</div>
+                <div class="org-node-role">Kepala Cabang Dinas Pendidikan</div>
             </div>
         </div>
-    </section>
-
-    {{-- Berita section --}}
-    <section id="berita" class="scroll-mt-24">
-        <div class="text-center mb-12">
-            <h3 class="text-4xl font-bold text-slate-900 mb-3">
-                Berita Terbaru
-            </h3>
-            <p class="text-lg text-slate-600">
-                Informasi dan update terkini dari Cabang Dinas Pendidikan
-            </p>
-        </div>
-
-        <div
-            x-data="{
-                index: 0,
-                total: {{ $berita->count() }},
-                timer: null,
-
-                start() {
-                    this.stop()
-                    this.timer = setInterval(() => {
-                        this.next()
-                    }, 2000)
-                },
-
-                stop() {
-                    if (this.timer) {
-                        clearInterval(this.timer)
-                        this.timer = null
-                    }
-                },
-
-                next() {
-                    this.index = this.index < this.total - 1 ? this.index + 1 : 0
-                },
-
-                prev() {
-                    this.index = this.index > 0 ? this.index - 1 : this.total - 1
-                }
-            }"
-            x-init="start()"
-            @mouseover="stop()"
-            @mouseout="start()"
-            class="relative max-w-4xl mx-auto cursor-pointer"
-        >
-
-            <!-- SLIDER -->
-            <div class="overflow-hidden">
-                <div
-                    class="flex transition-transform duration-700 ease-in-out"
-                    :style="`transform: translateX(-${index * 100}%)`"
-                >
-                    @foreach($berita as $item)
-                    <div class="min-w-full px-4">
-                        <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 border border-sky-100">
-
-                            <!-- Thumbnail -->
-                            <div class="h-48 bg-sky-100">
-                                @if($item->thumbnail)
-                                    <img src="{{ asset('storage/'.$item->thumbnail) }}"
-                                        class="w-full h-full object-cover">
-                                @endif
-                            </div>
-
-                            <!-- Content -->
-                            <div class="p-6 space-y-3">
-                                <span class="text-sm text-sky-600 font-semibold">
-                                    {{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}
-                                </span>
-
-                                <h4 class="text-2xl font-bold text-slate-900">
-                                    {{ $item->judul }}
-                                </h4>
-
-                                <p class="text-slate-600 line-clamp-3">
-                                    {{ Str::limit(strip_tags($item->konten), 150) }}
-                                </p>
-
-                                <a href="{{ route('berita.show', $item->id) }}"
-                                class="inline-flex items-center text-sky-600 font-semibold hover:text-sky-700">
-                                    Baca Selengkapnya →
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    @endforeach
-                </div>
-            </div>
-
-            <!-- NAVIGATION -->
-            <div class="flex justify-center items-center gap-6 mt-8">
-
-                <button
-                    @click="prev(); start()"
-                    class="w-10 h-10 flex items-center justify-center
-                        bg-sky-100 rounded-full hover:bg-sky-200 transition">
-                    ‹
-                </button>
-
-                <!-- DOT INDICATOR -->
-                <div class="flex gap-2">
-                    @foreach($berita as $i => $item)
-                    <button
-                        @click="index={{ $i }}; start()"
-                        class="w-3 h-3 rounded-full transition"
-                        :class="index === {{ $i }} ? 'bg-sky-600 scale-110' : 'bg-sky-300'">
-                    </button>
-                    @endforeach
-                </div>
-
-                <button
-                    @click="next(); start()"
-                    class="w-10 h-10 flex items-center justify-center
-                        bg-sky-100 rounded-full hover:bg-sky-200 transition">
-                    ›
-                </button>
-            </div>
-
-        </div>
-    </section>
-
-
-
-
-
-    <!-- STAFF SECTION -->
-    <section id="staff" class="scroll-mt-24">
-        <div class="bg-gradient-to-br from-sky-500 to-blue-600 rounded-3xl p-8 md:p-12 text-white shadow-2xl">
-            <div class="text-center mb-12">
-                <h3 class="text-3xl md:text-4xl font-bold mb-2">
-                    Staff Cabang Dinas Pendidikan
-                </h3>
-                <p class="text-sky-100 text-lg">
-                    Wilayah Kabupaten Malang
-                </p>
-            </div>
-
-            <!-- KEPALA CABANG -->
-            <div class="flex justify-center mb-10">
-                <div class="bg-white text-slate-800 rounded-2xl p-6 text-center w-64 shadow-xl">
-                    <div class="h-20 w-20 mx-auto bg-gradient-to-br from-sky-200 to-blue-300 rounded-full mb-3 flex items-center justify-center">
-                        <span class="text-2xl font-bold text-sky-700">DA</span>
-                    </div>
-                    <p class="text-base font-bold text-slate-900">Kepala Cabang Dinas</p>
-                    <p class="text-sm text-slate-600 mt-1">Dwi Anggraeni</p>
-                </div>
-            </div>
-
-            <div class="grid md:grid-cols-3 gap-8">
-                <!-- KASI SMK -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                    <div class="text-center mb-6">
-                        <div class="h-16 w-16 mx-auto bg-white/20 rounded-full mb-3 flex items-center justify-center">
-                            <span class="text-xl font-bold text-white">EM</span>
-                        </div>
-                        <p class="text-base font-bold">KASI SMK</p>
-                        <p class="text-sm text-sky-100">Evi Murti Hidayati</p>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white/5 rounded-xl p-4 text-center">
-                            <div class="h-12 w-12 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                <span class="text-sm font-bold">PN</span>
-                            </div>
-                            <p class="text-xs font-semibold">Penata Administrasi</p>
-                            <p class="text-xs text-sky-100">Prasetyo Nugroho</p>
-                        </div>
-                        <div class="bg-white/5 rounded-xl p-4 text-center">
-                            <div class="h-12 w-12 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                <span class="text-sm font-bold">WB</span>
-                            </div>
-                            <p class="text-xs font-semibold">Pengola Administrasi</p>
-                            <p class="text-xs text-sky-100">Windah Basudarah</p>
-                        </div>
+        <div class="org-connector-line"></div>
+        <div style="display:flex; justify-content:center;">
+            <div style="display:flex; flex-wrap:wrap; justify-content:center;">
+                <div style="display:flex; flex-direction:column; align-items:center; padding:0 8px; border-top:2px solid var(--border);">
+                    <div style="width:2px; height:22px; background:var(--border);"></div>
+                    <div class="org-node">
+                        <div class="org-node-avatar">RK</div>
+                        <div class="org-node-name">Rizal Kurniawan, S.Pd.</div>
+                        <div class="org-node-role">Kepala Sub Bag TU</div>
                     </div>
                 </div>
-
-                <!-- KASI SMA -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                    <div class="text-center mb-6">
-                        <div class="h-16 w-16 mx-auto bg-white/20 rounded-full mb-3 flex items-center justify-center">
-                            <span class="text-xl font-bold text-white">EM</span>
-                        </div>
-                        <p class="text-base font-bold">KASI SMA</p>
-                        <p class="text-sm text-sky-100">Evi Murti Hidayati</p>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="bg-white/5 rounded-xl p-4 text-center">
-                            <div class="h-12 w-12 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                <span class="text-sm font-bold">PN</span>
-                            </div>
-                            <p class="text-xs font-semibold">Penata Administrasi</p>
-                            <p class="text-xs text-sky-100">Prasetyo Nugroho</p>
-                        </div>
-                        <div class="bg-white/5 rounded-xl p-4 text-center">
-                            <div class="h-12 w-12 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                <span class="text-sm font-bold">WB</span>
-                            </div>
-                            <p class="text-xs font-semibold">Pengola Administrasi</p>
-                            <p class="text-xs text-sky-100">Windah Basudarah</p>
-                        </div>
+                <div style="display:flex; flex-direction:column; align-items:center; padding:0 8px; border-top:2px solid var(--border);">
+                    <div style="width:2px; height:22px; background:var(--border);"></div>
+                    <div class="org-node">
+                        <div class="org-node-avatar">HG</div>
+                        <div class="org-node-name">Hakso Gatut P., S.H.</div>
+                        <div class="org-node-role">Kasi SMA / PK / PLK</div>
                     </div>
                 </div>
-
-                <!-- KASUB BAG TU -->
-                <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                    <div class="text-center mb-6">
-                        <div class="h-16 w-16 mx-auto bg-white/20 rounded-full mb-3 flex items-center justify-center">
-                            <span class="text-xl font-bold text-white">EM</span>
-                        </div>
-                        <p class="text-base font-bold">KASUB BAG TU</p>
-                        <p class="text-sm text-sky-100">Evi Murti Hidayati</p>
+                <div style="display:flex; flex-direction:column; align-items:center; padding:0 8px; border-top:2px solid var(--border);">
+                    <div style="width:2px; height:22px; background:var(--border);"></div>
+                    <div class="org-node">
+                        <div class="org-node-avatar">EH</div>
+                        <div class="org-node-name">Evi Murti Hidayati</div>
+                        <div class="org-node-role">Kasi SMK</div>
                     </div>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="bg-white/5 rounded-xl p-3 text-center">
-                                <div class="h-10 w-10 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                    <span class="text-xs font-bold">PN</span>
-                                </div>
-                                <p class="text-xs font-semibold">P. Admin</p>
-                                <p class="text-xs text-sky-100">P. Nugroho</p>
-                            </div>
-                            <div class="bg-white/5 rounded-xl p-3 text-center">
-                                <div class="h-10 w-10 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                    <span class="text-xs font-bold">WB</span>
-                                </div>
-                                <p class="text-xs font-semibold">P. Admin</p>
-                                <p class="text-xs text-sky-100">W. Basudarah</p>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div class="bg-white/5 rounded-xl p-3 text-center">
-                                <div class="h-10 w-10 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                    <span class="text-xs font-bold">PN</span>
-                                </div>
-                                <p class="text-xs font-semibold">P. Admin</p>
-                                <p class="text-xs text-sky-100">P. Nugroho</p>
-                            </div>
-                            <div class="bg-white/5 rounded-xl p-3 text-center">
-                                <div class="h-10 w-10 mx-auto bg-white/20 rounded-full mb-2 flex items-center justify-center">
-                                    <span class="text-xs font-bold">WB</span>
-                                </div>
-                                <p class="text-xs font-semibold">P. Admin</p>
-                                <p class="text-xs text-sky-100">W. Basudarah</p>
-                            </div>
-                        </div>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:center; padding:0 8px; border-top:2px solid var(--border);">
+                    <div style="width:2px; height:22px; background:var(--border);"></div>
+                    <div class="org-node">
+                        <div class="org-node-avatar">PW</div>
+                        <div class="org-node-name">Pengawas Sekolah</div>
+                        <div class="org-node-role">Ahli Utama / Madya / Muda</div>
                     </div>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-</main>
+    <div x-data="{ activeTab: 'tu' }">
+        <div class="staff-tabs">
+            <button class="staff-tab" :class="activeTab === 'tu' ? 'staff-tab-active' : ''" @click="activeTab = 'tu'">Sub Bag Tata Usaha</button>
+            <button class="staff-tab" :class="activeTab === 'sma' ? 'staff-tab-active' : ''" @click="activeTab = 'sma'">Seksi SMA / PK / PLK</button>
+            <button class="staff-tab" :class="activeTab === 'smk' ? 'staff-tab-active' : ''" @click="activeTab = 'smk'">Seksi SMK</button>
+            <button class="staff-tab" :class="activeTab === 'pengawas' ? 'staff-tab-active' : ''" @click="activeTab = 'pengawas'">Pengawas</button>
+        </div>
+
+        <div x-show="activeTab === 'tu'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+            <div class="staff-grid">
+                @foreach([
+                    ['AM','Ahmad Mujib','19790721 201408 1 002','Pengadministrasi Perkantoran'],
+                    ['MA','Muhammad Aditya Darma Saputra, ST.','20020110 202504 1 001','Penata Kelola Sistem TI'],
+                    ['HS','Heri Subagyo, S.Pd.','19880903 202521 1 101','Penata Layanan Operasional'],
+                    ['AS','Adib Siswono, A.Md.','19770630 202521 1 041','Pengelola Layanan Operasional'],
+                    ['RS','Rois Safutro, SE.','19870707 202521 1 232','Penata Pelayanan Operasional'],
+                    ['RJ','Rista Julia Muchroma','—','Pengadministrasi Umum'],
+                    ['RN','Rully Yulian Nursobah, S.Kom.','19840728 201408 1 002','Bendahara Pengeluaran Pembantu'],
+                    ['Mu','Mudrikah, S.Pd.','19770309 201408 2 001','Pengadministrasi Perkantoran'],
+                    ['AO','Akhmad Oddi Awaludin, SE.','19910407 202521 1 133','Penata Layanan Operasional'],
+                    ['ST','Septian Trijoko Siswandaru, S.M.','19810926 202521 1 078','Penata Layanan Operasional'],
+                    ['FA','Fahrurrino Sofian Akbar A.','19911125 202521 1 130','Operator Layanan Operasional'],
+                ] as $s)
+                <div class="staff-card">
+                    <div class="staff-avatar">{{ $s[0] }}</div>
+                    <div>
+                        <div class="staff-role">{{ $s[3] }}</div>
+                        <div class="staff-name">{{ $s[1] }}</div>
+                        <div class="staff-nip">NIP. {{ $s[2] }}</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'sma'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+            <div class="staff-grid" style="max-width:600px;">
+                @foreach([
+                    ['HK','Haryono Kurniawan','19690820 200801 1 014','Pengadministrasi Perkantoran'],
+                    ['LM','Lutvian Marta, A.Md.','19920124 202521 1 004','Pengelola Layanan Operasional'],
+                ] as $s)
+                <div class="staff-card">
+                    <div class="staff-avatar" style="background:oklch(57% 0.16 55);">{{ $s[0] }}</div>
+                    <div>
+                        <div class="staff-role" style="color:oklch(50% 0.16 55);">{{ $s[3] }}</div>
+                        <div class="staff-name">{{ $s[1] }}</div>
+                        <div class="staff-nip">NIP. {{ $s[2] }}</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'smk'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+            <div class="staff-grid" style="max-width:600px;">
+                @foreach([
+                    ['PN','Prasetyo Nugroho, S.Kom.','19731018 201408 1 001','Pengadministrasi Perkantoran'],
+                    ['YP','Yuswinda Eka Puspitasari, SE.','19911211 202521 2 109','Penata Layanan Operasional'],
+                ] as $s)
+                <div class="staff-card">
+                    <div class="staff-avatar" style="background:oklch(40% 0.15 155);">{{ $s[0] }}</div>
+                    <div>
+                        <div class="staff-role" style="color:oklch(38% 0.15 155);">{{ $s[3] }}</div>
+                        <div class="staff-name">{{ $s[1] }}</div>
+                        <div class="staff-nip">NIP. {{ $s[2] }}</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div x-show="activeTab === 'pengawas'" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" x-cloak>
+            <div class="staff-grid" style="max-width:600px;">
+                @foreach(['Pengawas Sekolah Ahli Utama', 'Pengawas Sekolah Ahli Madya', 'Pengawas Sekolah Ahli Muda'] as $i => $label)
+                <div class="staff-card">
+                    <div class="staff-avatar" style="background:oklch(42% 0.18 290); font-size:16px; font-weight:800;">{{ $i + 1 }}</div>
+                    <div>
+                        <div class="staff-name">{{ $label }}</div>
+                        <div class="staff-nip">Jenjang Fungsional</div>
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+</section>
 
 <!-- FOOTER -->
-<footer class="bg-slate-900 text-white mt-20">
-    <div class="max-w-6xl mx-auto px-6 py-12">
-        <div class="grid md:grid-cols-4 gap-8 mb-8">
-            <div class="space-y-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-gradient-to-br from-sky-400 to-blue-600 rounded-lg flex items-center justify-center">
-                        <span class="text-white font-bold text-lg">E</span>
-                    </div>
-                    <span class="text-xl font-bold">E-CABDIN</span>
+<footer>
+    <div class="footer-top">
+        <div class="footer-brand">
+            <div class="footer-logo">
+                <svg viewBox="0 0 22 22" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+                    <path d="M11 2L2 7l9 5 9-5-9-5z"/>
+                    <path d="M2 12l9 5 9-5"/>
+                    <path d="M2 17l9 5 9-5"/>
+                </svg>
+            </div>
+            <div class="footer-name">E-Cabdin<br/>Kab. Malang · Jawa Timur</div>
+            <div class="footer-tagline">Melayani dengan tulus, mendidik untuk masa depan bangsa yang lebih cerah.</div>
+            <div class="footer-contact">
+                <div class="footer-contact-item">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M8 1C5.2 1 3 3.2 3 6c0 4 5 9 5 9s5-5 5-9c0-2.8-2.2-5-5-5zm0 7a2 2 0 100-4 2 2 0 000 4z"/></svg>
+                    Jl. Simpang Ijen No. 2, Klojen, Malang 65119
                 </div>
-                <p class="text-slate-400 text-sm">
-                    Cabang Dinas Pendidikan Provinsi Jawa Timur Wilayah Kabupaten Malang
-                </p>
-            </div>
-            
-            <div>
-                <h4 class="font-bold mb-4"></h4>
-                {{-- <ul class="space-y-2 text-slate-400 text-sm">
-                    <li><a href="#" class="hover:text-sky-400 transition-colors">Administrasi</a></li>
-                    <li><a href="#" class="hover:text-sky-400 transition-colors">Perizinan</a></li>
-                    <li><a href="#" class="hover:text-sky-400 transition-colors">Konsultasi</a></li>
-                </ul> --}}
-            </div>
-            
-            <div>
-                <h4 class="font-bold mb-4">Informasi</h4>
-                <ul class="space-y-2 text-slate-400 text-sm">
-                    <li><a href="#" class="hover:text-sky-400 transition-colors">Tentang Kami</a></li>
-                    <li><a href="#" class="hover:text-sky-400 transition-colors">Kontak</a></li>
-                    <li><a href="#" class="hover:text-sky-400 transition-colors">FAQ</a></li>
-                </ul>
-            </div>
-            
-            <div>
-                <h4 class="font-bold mb-4">Hubungi Kami</h4>
-                <ul class="space-y-2 text-slate-400 text-sm">
-                    <li>Jl. Simpang Ijen No. 2 Oro-oro Dowo, Klojen, Malang</li>
-                    <li>Jawa Timur, Indonesia 65119</li>
-                    <li class="pt-2">Email: cabdinkabmalang.gmail.com</li>
-                </ul>
+                <div class="footer-contact-item">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14"><path d="M2 4a1 1 0 011-1h10a1 1 0 011 1v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4zm0 0l6 5 6-5"/></svg>
+                    cabdinkabmalang@gmail.com
+                </div>
             </div>
         </div>
-        
-        <div class="border-t border-slate-800 pt-8 text-center text-slate-400 text-sm">
-            © 2026 E-Cabdin - Cabang Dinas Pendidikan Kabupaten Malang. All rights reserved.
+        <div>
+            <div class="footer-col-title">Layanan</div>
+            <div class="footer-links">
+                <a href="#layanan">Perizinan Sekolah</a>
+                <a href="#layanan">Sertifikasi Guru</a>
+                <a href="#layanan">Bantuan Siswa</a>
+                <a href="#layanan">Data Pendidikan</a>
+                <a href="#layanan">Pengaduan</a>
+            </div>
         </div>
+        <div>
+            <div class="footer-col-title">Navigasi</div>
+            <div class="footer-links">
+                <a href="#hero">Beranda</a>
+                <a href="#produk">Produk Sekolah</a>
+                <a href="#prosedur">Prosedur</a>
+                <a href="#berita">Berita</a>
+                <a href="#staff">Organisasi</a>
+            </div>
+        </div>
+        <div>
+            <div class="footer-col-title">Tautan</div>
+            <div class="footer-links">
+                <a href="{{ route('login') }}">Masuk Sistem</a>
+                <a href="#">Dapodik</a>
+                <a href="#">e-PPDB</a>
+                <a href="#">SIPTK</a>
+                <a href="#">Disdik Jatim</a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-copy">&copy; 2026 E-Cabdin &mdash; Cabang Dinas Pendidikan Kab. Malang. All rights reserved.</div>
     </div>
 </footer>
 
 <script>
-    const header = document.getElementById('main-header');
-
+    // Navbar scroll shadow
+    const nav = document.getElementById('navbar');
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 10) {
-            header.classList.add('shadow-lg');
-        } else {
-            header.classList.remove('shadow-lg');
-        }
+        nav.classList.toggle('scrolled', window.scrollY > 20);
     });
 
-    // Smooth scroll for navigation links
+    // Scroll reveal
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+        });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+    // Smooth scroll
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href.length <= 1) return;
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
+            const target = document.querySelector(href);
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
     });
 </script>
-
 </body>
 </html>

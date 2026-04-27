@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class SuratKeluar extends Model
@@ -12,24 +11,16 @@ class SuratKeluar extends Model
     protected $fillable = [
         'user_id',
         'nomor_surat',
-        'tujuan',
-        'perihal',
-        'isi_surat',
-        'status',
-        'catatan_pimpinan',
-        'tanggal_disetujui',
-        'tanggal_kirim'
+        'judul_surat',
+        'tanggal_terbit',
+    ];
+
+    protected $casts = [
+        'tanggal_terbit' => 'date',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
-    }
-     public function suratMasuk()
-    {
-        return $this->belongsTo(SuratMasuk::class, 'surat_masuk_id');
+        return $this->belongsTo(User::class);
     }
 }
-
-
-

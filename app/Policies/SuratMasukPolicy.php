@@ -14,11 +14,22 @@ class SuratMasukPolicy
     }
 
     
-    public function view(User $user, SuratMasuk $surat)
+    /**
+     * Siapa yang bisa melihat detail surat
+     */
+    public function view(User $user, SuratMasuk $suratMasuk)
     {
-        return $user->role === 'staff'
-            ? $surat->user_id === $user->id
-            : true;
+        // TU dan Pimpinan bisa lihat semua
+        if (in_array($user->role, ['tu', 'pimpinan'])) {
+            return true;
+        }
+
+        // Staff hanya bisa lihat surat yang didisposisikan ke dia
+        if ($user->role === 'staff') {
+            return $suratMasuk->penerima()->where('user_id', $user->id)->exists();
+        }
+
+        return false;
     }
 
     public function create(User $user)

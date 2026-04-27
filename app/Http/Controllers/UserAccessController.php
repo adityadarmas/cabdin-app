@@ -2,89 +2,133 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
+// use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserAccessController extends Controller
 {
     /**
-     * Tampilkan daftar user
+     * Tampilkan dashboard + daftar semua user dengan fitur pencarian.
+     * Route: GET /admin/dashboard  →  name: admin.dashboard
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(10);
-        return view('users.admin.index', compact('users'));
+        $search = $request->input('search');
+
+        $users = User::when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(10)
+            ->withQueryString();
+
+        $roles = ['admin', 'staff', 'tu', 'pimpinan'];
+
+        return view('dashboard.admin.index', compact('users', 'roles', 'search'));
     }
 
-    // Form tambah user
-    public function create()
-    {
-        $roles = ['admin', 'tu', 'pimpinan', 'staff']; // Sesuaikan role
-        return view('users.admin.create', compact('roles'));
-    }
-
-    // Simpan user baru
+    /**
+     * Simpan user baru.
+     * Route: POST /admin/users  →  name: admin.users.store
+     */
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'role' => 'required|in:admin,tu,pimpinan,staff',
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
+            'role'     => 'required|in:admin,staff,tu,pimpinan,operator',
+        ], [
+            'name.required'      => 'Nama wajib diisi.',
+            'email.required'     => 'Email wajib diisi.',
+            'email.unique'       => 'Email sudah digunakan.',
+            'password.required'  => 'Password wajib diisi.',
+            'password.min'       => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'role.required'      => 'Role wajib dipilih.',
         ]);
 
         User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
+            'name'     => $request->name,
+            'email'    => $request->email,
             'password' => Hash::make($request->password),
+            'role'     => $request->role,
         ]);
 
-        return redirect()->route('users.index')
-            ->with('success', 'User baru berhasil ditambahkan');
+        return redirect()->route('admin.dashboard')
+                         ->with('success', 'User berhasil ditambahkan.');
     }
 
     /**
-     * Form edit hak akses user
-     */
-    public function edit(User $user)
-    {
-        $roles = ['admin', 'tu', 'pimpinan', 'staff']; // sesuaikan role
-        return view('users.admin.edit', compact('user', 'roles'));
-    }
-
-    /**
-     * Update hak akses user
+     * Update data user.
+     * Route: PUT /admin/users/{user}  →  name: admin.users.update
      */
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'role' => 'required|in:admin,tu,pimpinan,staff',
+            'name'     => 'required|string|max:255',
+            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'role'     => 'required|in:admin,staff,tu,pimpinan,operator',
+            'password' => 'nullable|string|min:6|confirmed',
+        ], [
+            'name.required'      => 'Nama wajib diisi.',
+            'email.required'     => 'Email wajib diisi.',
+            'email.unique'       => 'Email sudah digunakan user lain.',
+            'role.required'      => 'Role wajib dipilih.',
+            'password.min'       => 'Password minimal 6 karakter.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
         ]);
 
-        $user->update([
-            'role' => $request->role,
-        ]);
+        $data = [
+            'name'  => $request->name,
+            'email' => $request->email,
+            'role'  => $request->role,
+        ];
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'Hak akses user berhasil diperbarui');
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->route('admin.dashboard')
+                         ->with('success', 'User berhasil diperbarui.');
     }
 
-    // Hapus user
+    public function updatePassword(Request $request, $id)
+    {
+        $request->validate([
+            'password' => 'required|min:6|confirmed',
+        ]);
+
+        $user = User::findOrFail($id);
+
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return back()->with('success', 'Password berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus user.
+     * Route: DELETE /admin/users/{user}  →  name: admin.users.destroy
+     */
     public function destroy(User $user)
     {
-        // Opsional: cek agar admin tidak bisa hapus dirinya sendiri
-        if (auth()->id() == $user->id) {
-            return redirect()->route('users.index')
-                ->with('error', 'Anda tidak dapat menghapus user sendiri');
+        if ($user->id === auth()->id()) {
+            return redirect()->route('admin.users.index')
+                             ->with('error', 'Anda tidak bisa menghapus akun sendiri.');
         }
 
         $user->delete();
 
-        return redirect()->route('users.index')
-            ->with('success', 'User berhasil dihapus');
+        return redirect()->route('admin.users.index')
+                         ->with('success', 'User berhasil dihapus.');
     }
 }

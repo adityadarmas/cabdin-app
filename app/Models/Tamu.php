@@ -15,6 +15,7 @@ class Tamu extends Model
         'nama',
         'asal',
         'keperluan',
+        'nomor_hp',
     ];
 
     /**

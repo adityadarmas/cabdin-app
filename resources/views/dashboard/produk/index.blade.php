@@ -1,15 +1,15 @@
-@extends('layouts.admin')
+@extends('layouts.app')
 
 @section('content')
 <div class="p-6">
 
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-2xl font-bold">Data produk</h1>
-        <a href="{{ route('produk.create') }}"
-           class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-            + Tambah produk
-        </a>
-    </div>
+            <h1 class="text-2xl font-semibold">Manajemen produk</h1>
+
+            <a href="{{ route('produk.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                + Tambah Produk
+            </a>
+        </div>
 
     @if (session('success'))
         <div class="mb-4 p-3 bg-green-100 text-green-800 rounded">
@@ -17,7 +17,7 @@
         </div>
     @endif
 
-    <div class="overflow-x-auto bg-white rounded shadow">
+    <div class="bg-white rounded shadow overflow-x-auto">
         <table class="min-w-full text-sm">
             <thead class="bg-gray-100">
                 <tr>

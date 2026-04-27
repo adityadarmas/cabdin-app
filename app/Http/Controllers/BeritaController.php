@@ -13,10 +13,21 @@ class BeritaController extends Controller
         return view('dashboard.berita.index', compact('data'));
     }
 
-     // detail berita
+    public function publicIndex()
+    {
+        $berita = Berita::where('is_active', 1)->latest()->paginate(9);
+        return view('berita.index', compact('berita'));
+    }
+
     public function show(Berita $berita)
     {
-        return view('dashboard.berita.show', compact('berita'));
+        $related = Berita::where('is_active', 1)
+            ->where('id', '!=', $berita->id)
+            ->latest()
+            ->limit(3)
+            ->get();
+
+        return view('berita.show', compact('berita', 'related'));
     }
 
     public function create()

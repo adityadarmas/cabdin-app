@@ -50,6 +50,28 @@
                     @enderror
                 </div>
 
+                <!-- Kategori -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+                    <select name="kategori"
+                            class="w-full rounded-xl border-gray-300 px-4 py-3 focus:ring-2 focus:ring-blue-500
+                                   @error('kategori') border-red-500 @enderror">
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="jasa"       {{ old('kategori') == 'jasa'       ? 'selected' : '' }}>🛠️ Jasa</option>
+                        <option value="makanan"    {{ old('kategori') == 'makanan'    ? 'selected' : '' }}>🍱 Makanan</option>
+                        <option value="minuman"    {{ old('kategori') == 'minuman'    ? 'selected' : '' }}>🥤 Minuman</option>
+                        <option value="kerajinan"  {{ old('kategori') == 'kerajinan'  ? 'selected' : '' }}>🎨 Kerajinan</option>
+                        <option value="pertanian"  {{ old('kategori') == 'pertanian'  ? 'selected' : '' }}>🌱 Pertanian</option>
+                        <option value="teknologi"  {{ old('kategori') == 'teknologi'  ? 'selected' : '' }}>💻 Teknologi</option>
+                        <option value="lainnya"    {{ old('kategori') == 'lainnya'    ? 'selected' : '' }}>📦 Lainnya</option>
+                    </select>
+                    @error('kategori')
+                        <p class="mt-1 text-sm text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <!-- Deskripsi -->
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">

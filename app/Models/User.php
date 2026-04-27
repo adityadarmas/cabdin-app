@@ -20,6 +20,8 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'nama_sekolah',
+        'no_wa',
         'email',
         'role',
         'password',
@@ -56,6 +58,11 @@ class User extends Authenticatable
         return $this->hasMany(SuratMasuk::class, 'user_id');
     }
 
+    public function produks()
+    {
+        return $this->hasMany(\App\Models\Produk::class, 'user_id');
+    }
+
     // fungsi role per user
     public function isTU()
     {
@@ -75,6 +82,11 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->role === 'admin';
+    }
+
+    public function isOperator()
+    {
+        return $this->role === 'operator';
     }
 
 

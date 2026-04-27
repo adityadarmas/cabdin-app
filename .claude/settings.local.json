@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan:*)",
+      "WebFetch(domain:skalaku.vercel.app)",
+      "Bash(php -l app/Http/Controllers/SuratMasukController.php)",
+      "Bash(xargs grep *)"
+    ]
+  }
+}

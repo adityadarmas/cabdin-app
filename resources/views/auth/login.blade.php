@@ -107,7 +107,7 @@
         </form>
 
         <!-- REGISTER LINK -->
-        <div class="mt-8 text-center">
+        {{-- <div class="mt-8 text-center">
             <p class="text-slate-600">
                 Belum punya akun?
                 <a href="{{ url('/register') }}" class="font-semibold text-sky-600 hover:text-sky-700 transition-colors">
@@ -115,7 +115,7 @@
                 </a>
             </p>
         </div>
-    </div>
+    </div> --}}
 
     <!-- BACK TO HOME -->
     <div class="text-center mt-6">

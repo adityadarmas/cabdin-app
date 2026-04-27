@@ -25,16 +25,15 @@ class LoginController extends Controller
         // Redirect berdasarkan role
         $role = auth()->user()->role;
 
-        if (auth()->user()->role === 'admin') {
-        return redirect()->route('dashboard.index');
+        if ($role === 'admin') {
+            return redirect()->route('admin.users.index');
         }
 
-        // MENGGUNAKAN POLICY (TANPA URI KE ROLE)
+        if ($role === 'operator') {
+            return redirect()->route('operator.produk.index');
+        }
+
         return redirect()->route('surat-masuk.index');
-
-
-        // Fallback kalau role tidak dikenal
-        return redirect()->intended('/home');
     }
 
     return back()->withErrors([

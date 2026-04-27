@@ -61,7 +61,7 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium mb-1">Asal</label>
+                <label class="block text-sm font-medium mb-1">Alamat/Asal</label>
                 <input
                     type="text"
                     name="asal"
@@ -79,6 +79,17 @@
                     required
                     class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
                 >{{ old('keperluan') }}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Nomor HP / WhatsApp</label>
+                <input
+                    type="text"
+                    name="nomor_hp"
+                    value="{{ old('nomor_hp') }}"
+                    placeholder="Contoh: 08123456789"
+                    class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400"
+                >
             </div>
 
             <div class="flex justify-end">
@@ -107,6 +118,7 @@
                     <th class="px-4 py-3 text-left">Nama</th>
                     <th class="px-4 py-3 text-left">Asal</th>
                     <th class="px-4 py-3 text-left">Keperluan</th>
+                    <th class="px-4 py-3 text-left">No. HP</th>
                     {{-- <th class="px-4 py-3 text-center">Aksi</th> --}}
                 </tr>
             </thead>
@@ -117,6 +129,7 @@
                     <td class="px-4 py-3 font-medium">{{ $item->nama }}</td>
                     <td class="px-4 py-3">{{ $item->asal }}</td>
                     <td class="px-4 py-3">{{ $item->keperluan }}</td>
+                    <td class="px-4 py-3">{{ $item->nomor_hp ?? '-' }}</td>
                     {{-- <td class="px-4 py-3 text-center">
                         <a
                             href="{{ route('tamu.edit', $item) }}"

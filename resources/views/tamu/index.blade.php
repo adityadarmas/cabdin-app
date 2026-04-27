@@ -30,8 +30,9 @@
                 <tr>
                     <th class="px-4 py-3 text-left">No</th>
                     <th class="px-4 py-3 text-left">Nama</th>
-                    <th class="px-4 py-3 text-left">Asal</th>
+                    <th class="px-4 py-3 text-left">Alamat/Asal</th>
                     <th class="px-4 py-3 text-left">Keperluan</th>
+                    <th class="px-4 py-3 text-left">No. HP</th>
                     {{-- <th class="px-4 py-3 text-center">Aksi</th> --}}
                 </tr>
             </thead>
@@ -50,6 +51,9 @@
                     </td>
                     <td class="px-4 py-3">
                         {{ $item->keperluan }}
+                    </td>
+                    <td class="px-4 py-3">
+                        {{ $item->nomor_hp ?? '-' }}
                     </td>
                     {{-- <td class="px-4 py-3 text-center">
                         <a href="{{ route('tamu.edit', $item) }}"

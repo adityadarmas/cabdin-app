@@ -7,24 +7,25 @@ use App\Models\User;
 
 class SuratKeluarPolicy
 {
-    public function view(User $user, SuratKeluar $surat)
+    public function viewAny(User $user): bool
     {
-        return $user->id === $surat->user_id || $user->role !== 'staff';
+        return $user->role !== 'operator';
     }
 
-    public function update(User $user, SuratKeluar $surat)
+    public function create(User $user): bool
     {
-        return $user->id === $surat->user_id && $surat->status === 'draft';
+        return $user->role !== 'operator';
     }
 
-    public function ajukan(User $user, SuratKeluar $surat)
+    public function update(User $user, SuratKeluar $suratKeluar): bool
     {
-        return $user->id === $surat->user_id && $surat->status === 'draft';
+        if ($user->role === 'operator') return false;
+        return in_array($user->role, ['admin', 'tu']) || $user->id === $suratKeluar->user_id;
     }
 
-    public function approve(User $user, SuratKeluar $surat)
+    public function delete(User $user, SuratKeluar $suratKeluar): bool
     {
-        return $user->role === 'pimpinan'
-            && $surat->status === 'menunggu_persetujuan';
+        if ($user->role === 'operator') return false;
+        return in_array($user->role, ['admin', 'tu']) || $user->id === $suratKeluar->user_id;
     }
 }

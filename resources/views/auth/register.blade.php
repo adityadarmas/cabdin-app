@@ -25,7 +25,7 @@
 
     <!-- Registration Form -->
     <div class="bg-white rounded-3xl shadow-2xl p-8 border border-sky-100">
-        <form action="{{ url('/register') }}" method="POST" id="registerForm" class="space-y-6">
+        <form action="{{ route('admin.register') }}" method="POST" id="registerForm" class="space-y-6">
             @csrf
             <!-- Role Selection -->
             <div class="space-y-2">
@@ -70,9 +70,53 @@
                             <span class="text-sm font-semibold text-slate-700">Admin</span>
                         </div>
                     </label>
+                    <label class="relative cursor-pointer">
+                        <input type="radio" name="role" value="operator" class="peer sr-only" {{ old('role') == 'operator' ? 'checked' : '' }}>
+                        <div class="p-4 bg-slate-50 border-2 border-slate-200 rounded-xl text-center transition-all peer-checked:border-sky-500 peer-checked:bg-sky-50">
+                            <svg class="w-8 h-8 mx-auto mb-2 text-slate-400 peer-checked:text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                            </svg>
+                            <span class="text-sm font-semibold text-slate-700">Operator Sekolah</span>
+                        </div>
+                    </label>
                 </div>
                 @error('role') 
                 <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- Field khusus operator -->
+            <div id="fieldNamaSekolah" class="space-y-2 hidden">
+                <label for="nama_sekolah" class="block text-sm font-semibold text-slate-700">
+                    Nama Sekolah <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="nama_sekolah"
+                    name="nama_sekolah"
+                    value="{{ old('nama_sekolah') }}"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    placeholder="Contoh: SMK Negeri 1 Kota">
+                @error('nama_sekolah')
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <!-- No WhatsApp (khusus operator) -->
+            <div id="fieldNoWa" class="space-y-2 hidden">
+                <label for="no_wa" class="block text-sm font-semibold text-slate-700">
+                    Nomor WhatsApp <span class="text-red-500">*</span>
+                </label>
+                <input
+                    type="text"
+                    id="no_wa"
+                    name="no_wa"
+                    value="{{ old('no_wa') }}"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    placeholder="Contoh: 08123456789">
+                <p class="text-xs text-slate-400">Nomor ini akan ditampilkan sebagai kontak di halaman produk</p>
+                @error('no_wa')
+                    <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                 @enderror
             </div>
 
@@ -213,6 +257,24 @@
 </div>
 
 <script>
+    function toggleOperatorFields(isOperator) {
+        ['fieldNamaSekolah', 'fieldNoWa'].forEach(function(id) {
+            document.getElementById(id).classList.toggle('hidden', !isOperator);
+        });
+        document.getElementById('nama_sekolah').required = isOperator;
+        document.getElementById('no_wa').required = isOperator;
+    }
+
+    document.querySelectorAll('input[name="role"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            toggleOperatorFields(this.value === 'operator');
+        });
+    });
+
+    // Saat halaman load ulang (ada old value)
+    const checkedRole = document.querySelector('input[name="role"]:checked');
+    if (checkedRole) toggleOperatorFields(checkedRole.value === 'operator');
+
     function togglePassword(inputId, iconId) {
         const passwordInput = document.getElementById(inputId);
         const eyeIcon = document.getElementById(iconId);

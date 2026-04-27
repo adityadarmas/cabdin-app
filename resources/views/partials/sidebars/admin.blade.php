@@ -1,3 +1,4 @@
+
 {{-- staff.blade.php --}}
 <aside class="w-64 text-white min-h-screen p-4">
     
@@ -6,9 +7,9 @@
 
         <!-- Manajemen User -->
         <li>
-            <a href="{{ route('surat-masuk.create') }}"
+            <a href="{{ route('admin.users.index') }}"
                class="block px-4 py-2 rounded-lg transition
-                      {{ request()->routeIs('surat-masuk.create') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                      {{ request()->routeIs('admin.users.index') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
                 Manajemen User
             </a>
         </li>
@@ -20,12 +21,19 @@
                 Dashboard Berita
             </a>
         </li>
-        <!-- Dashboard Prosedur-->
+        <!-- Manajemen Prosedur -->
+        <li>
+            <a href="{{ route('kategori-prosedur.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('kategori-prosedur.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Kategori Prosedur
+            </a>
+        </li>
         <li>
             <a href="{{ route('prosedur.index') }}"
-               class="block px-4 py-2 rounded-lg transition
-                      {{ request()->routeIs('prosedur.index') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Dashboard Prosedur
+               class="block px-4 py-2 pl-7 rounded-lg transition text-sm
+                      {{ request()->routeIs('prosedur.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                ↳ Sub-Prosedur
             </a>
         </li>
         <!-- Dashboard Produk-->
@@ -34,6 +42,22 @@
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('produk.index') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
                 Dashboard Produk
+            </a>
+        </li>
+
+        <!-- Surat Keluar -->
+        <li>
+            <a href="{{ route('surat-keluar.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('surat-keluar.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Nomor Surat Keluar
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('admin.nomor-surat-setting.edit') }}"
+               class="block px-4 py-2 pl-7 rounded-lg transition text-sm
+                      {{ request()->routeIs('admin.nomor-surat-setting.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                ↳ Pengaturan Nomor
             </a>
         </li>
 

@@ -2,16 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NomorSuratSetting;
 use App\Models\SuratKeluar;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SuratKeluarController extends Controller
 {
     public function index()
     {
-        $surat = SuratKeluar::latest()->get();
-        return view('surat_keluar.index', compact('surat'));
+        $suratKeluar = SuratKeluar::with('user')->latest()->paginate(15);
+        return view('surat_keluar.index', compact('suratKeluar'));
     }
 
     public function create()
@@ -21,28 +21,18 @@ class SuratKeluarController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'tujuan' => 'required',
-            'perihal' => 'required',
-            'isi_surat' => 'required',
+        $validated = $request->validate([
+            'judul_surat'    => 'required|string|max:255',
+            'tanggal_terbit' => 'required|date',
         ]);
 
-        SuratKeluar::create([
-            'user_id' => Auth::id(),
-            'tujuan' => $request->tujuan,
-            'perihal' => $request->perihal,
-            'isi_surat' => $request->isi_surat,
-            'status' => 'draft'
-        ]);
+        $validated['nomor_surat'] = NomorSuratSetting::generateNext();
+        $validated['user_id']     = auth()->id();
+
+        SuratKeluar::create($validated);
 
         return redirect()->route('surat-keluar.index')
-            ->with('success', 'Draft surat berhasil dibuat');
-    }
-
-    public function show(SuratKeluar $suratKeluar)
-    {
-        $this->authorize('view', $suratKeluar);
-        return view('surat_keluar.show', compact('suratKeluar'));
+            ->with('success', 'Surat keluar berhasil dicatat.');
     }
 
     public function edit(SuratKeluar $suratKeluar)
@@ -55,39 +45,24 @@ class SuratKeluarController extends Controller
     {
         $this->authorize('update', $suratKeluar);
 
-        $suratKeluar->update($request->only('tujuan','perihal','isi_surat'));
-
-        return redirect()->route('surat-keluar.index');
-    }
-
-    public function ajukan(SuratKeluar $suratKeluar)
-    {
-        $this->authorize('ajukan', $suratKeluar);
-
-        $suratKeluar->update([
-            'status' => 'menunggu_persetujuan'
+        $validated = $request->validate([
+            'judul_surat'    => 'required|string|max:255',
+            'tanggal_terbit' => 'required|date',
         ]);
 
-        return back()->with('success', 'Surat diajukan ke pimpinan');
+        $suratKeluar->update($validated);
+
+        return redirect()->route('surat-keluar.index')
+            ->with('success', 'Surat keluar berhasil diperbarui.');
     }
 
-    public function setujui(SuratKeluar $suratKeluar)
+    public function destroy(SuratKeluar $suratKeluar)
     {
-        $this->authorize('approve', $suratKeluar);
+        $this->authorize('delete', $suratKeluar);
 
-        $suratKeluar->update([
-            'status' => 'disetujui',
-            'nomor_surat' => $this->generateNomor(),
-            'tanggal_disetujui' => now()
-        ]);
+        $suratKeluar->delete();
 
-        return back();
-    }
-
-    protected function generateNomor()
-    {
-        $last = SuratKeluar::whereNotNull('nomor_surat')->count() + 1;
-        return str_pad($last, 3, '0', STR_PAD_LEFT)
-            . '/SK/' . now()->format('m/Y');
+        return redirect()->route('surat-keluar.index')
+            ->with('success', 'Surat keluar berhasil dihapus.');
     }
 }
