@@ -13,19 +13,22 @@
 <header class="bg-gradient-to-r from-sky-600 to-blue-700 text-white shadow">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-bold text-xl">E</div>
-            <span class="text-xl font-bold tracking-wide">E-CABDIN</span>
+            <img src="{{ asset('favicon.png') }}" alt="Logo" class="w-10 h-10">
+            {{-- <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center font-bold text-xl">E</div> --}}
+            <span class="text-xl font-bold tracking-wide">SKALAKU</span>
         </div>
-        <a href="{{ url('/landing') }}" class="text-sm text-white/80 hover:text-white transition">&#8592; Beranda</a>
+        <a href="{{ url('/') }}" class="text-sm text-white/80 hover:text-white transition">&#8592; Beranda</a>
     </div>
 </header>
 
 {{-- ===== HERO ===== --}}
 <section class="bg-gradient-to-r from-sky-600 to-blue-700 text-white pb-10">
     <div class="max-w-7xl mx-auto px-6 pt-10 text-center">
-        <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Produk & Layanan</h1>
-        <p class="text-sky-100 text-sm md:text-base mb-8">
-            Temukan produk unggulan dari berbagai sekolah
+        <h1 class="text-3xl md:text-4xl font-extrabold mb-2">Sekolah Kita Laku</h1>
+        <p class="text-sky-100 text-sm md:text-base">
+            Temukan produk unggulan dari berbagai sekolah SMA dan SMK di wilayah Kabupaten Malang
+        <p class="text-sky-50 text-sm md:text-base mb-8">
+            Dukung kreativitas dan inovasi mereka dengan membeli produk berkualitas langsung dari pembuatnya!
         </p>
 
         {{-- Stats --}}

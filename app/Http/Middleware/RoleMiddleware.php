@@ -10,11 +10,17 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles)
     {
         if (!auth()->check()) {
-            abort(403, 'Belum login.');
+            return redirect()->route('login');
         }
 
         if (!in_array(auth()->user()->role, $roles)) {
-            abort(403, 'Akses ditolak.');
+            $role = auth()->user()->role;
+            $redirect = match ($role) {
+                'admin'    => route('admin.users.index'),
+                'operator' => route('operator.produk.index'),
+                default    => route('surat-masuk.index'),
+            };
+            return redirect($redirect);
         }
 
         return $next($request);

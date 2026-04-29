@@ -71,14 +71,6 @@
                    class="w-full border rounded px-3 py-2">
         </div>
 
-        <div>
-            <label class="block font-medium mb-1">Status</label>
-            <select name="is_active" class="w-full border rounded px-3 py-2">
-                <option value="1" {{ $produk->is_active ? 'selected' : '' }}>Aktif</option>
-                <option value="0" {{ !$produk->is_active ? 'selected' : '' }}>Nonaktif</option>
-            </select>
-        </div>
-
         <div class="flex gap-3 pt-4 border-t">
             <button type="submit"
                     class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">

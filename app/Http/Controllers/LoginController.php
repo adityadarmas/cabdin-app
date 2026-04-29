@@ -14,32 +14,28 @@ class LoginController extends Controller
 
     public function authenticate(Request $request)
     {
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+        $credentials = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
+        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+            $request->session()->regenerate();
 
-        // Redirect berdasarkan role
-        $role = auth()->user()->role;
+            $role = auth()->user()->role;
+            $default = match ($role) {
+                'admin'    => route('admin.users.index'),
+                'operator' => route('operator.produk.index'),
+                default    => route('surat-masuk.index'),
+            };
 
-        if ($role === 'admin') {
-            return redirect()->route('admin.users.index');
+            return redirect()->intended($default);
         }
 
-        if ($role === 'operator') {
-            return redirect()->route('operator.produk.index');
-        }
-
-        return redirect()->route('surat-masuk.index');
+        return back()->withErrors([
+            'email' => 'Email atau password salah.',
+        ])->onlyInput('email');
     }
-
-    return back()->withErrors([
-        'email' => 'Email atau password salah.',
-    ])->onlyInput('email');
-}
 
 
     public function logout(Request $request)

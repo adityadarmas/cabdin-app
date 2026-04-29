@@ -18,6 +18,14 @@
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
+    # Hostinger: jika /storage/X tidak ada sebagai file langsung,
+    # coba layani dari /storage/app/public/X (terjadi saat public/ digabung ke root).
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} ^/?storage/(.+)$
+    RewriteCond %{DOCUMENT_ROOT}/storage/app/public/%1 -f
+    RewriteRule ^storage/(.+)$ storage/app/public/$1 [L]
+
     # Send Requests To Front Controller...
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f

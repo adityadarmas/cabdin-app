@@ -140,16 +140,74 @@
         .stat-item:not(:last-child) { border-right: 1px solid rgba(255,255,255,.25); }
         .stat-num { font-size: 28px; font-weight: 800; color: white; letter-spacing: -.03em; line-height: 1; }
         .stat-label { font-size: 11px; font-weight: 600; letter-spacing: .06em; color: rgba(255,255,255,.65); margin-top: 4px; }
-        .hero-visual { position: relative; }
-        .hero-img-wrap {
-            aspect-ratio: 4/3.2;
-            background: rgba(255,255,255,.12);
-            border: 1px solid rgba(255,255,255,.2);
-            border-radius: var(--radius-lg);
-            overflow: hidden; position: relative;
-            display: flex; align-items: center; justify-content: center;
+        .hero-visual { position: relative; display: flex; align-items: center; justify-content: center; }
+        .map-wrap { position: relative; display: flex; align-items: center; justify-content: center; width: 100%; }
+        .kab-map {
+            width: 100%; max-width: 460px;
+            animation: mapEnter .8s cubic-bezier(.16,1,.3,1) .2s both;
+            filter: drop-shadow(0 0 40px rgba(255,255,255,.13)) drop-shadow(0 4px 60px rgba(80,130,255,.18));
+            overflow: visible;
         }
-        .hero-img-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 40px; opacity: 0.9; }
+        @keyframes mapEnter {
+            from { opacity: 0; transform: translateX(60px) scale(.9); }
+            to   { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .kab-boundary {
+            stroke: rgba(255,255,255,.9);
+            stroke-width: 2.5;
+            stroke-linejoin: round;
+            fill-opacity: 0;
+            stroke-dasharray: 1850;
+            stroke-dashoffset: 1850;
+            animation: drawMap 2.2s ease-out .6s forwards;
+        }
+        @keyframes drawMap {
+            0%  { stroke-dashoffset: 1850; fill-opacity: 0; }
+            65% { stroke-dashoffset: 0;    fill-opacity: 0; }
+            100%{ stroke-dashoffset: 0;    fill-opacity: 1; }
+        }
+        .enclave-path {
+            fill: rgba(255,255,255,.08);
+            stroke: rgba(255,255,255,.5);
+            stroke-width: 1.4;
+            stroke-dasharray: 4,3;
+            opacity: 0;
+            animation: fadeReveal .5s ease 2.5s forwards;
+        }
+        .enclave-path.delay { animation-delay: 2.65s; }
+        .dot-pulse {
+            fill: none;
+            stroke: rgba(255,255,255,.7);
+            stroke-width: 1.5;
+            transform-box: fill-box;
+            transform-origin: center;
+            animation: pulse 2s ease-out 3.4s infinite;
+        }
+        @keyframes pulse {
+            0%   { transform: scale(1); opacity: .75; }
+            100% { transform: scale(4.5); opacity: 0; }
+        }
+        .city-dot {
+            fill: white;
+            transform-box: fill-box;
+            transform-origin: center;
+            opacity: 0;
+            transform: scale(0);
+        }
+        .d1 { animation: dotPop .4s cubic-bezier(.34,1.56,.64,1) 2.8s forwards; }
+        .d2 { animation: dotPop .4s cubic-bezier(.34,1.56,.64,1) 2.95s forwards; }
+        .d3 { animation: dotPop .4s cubic-bezier(.34,1.56,.64,1) 3.1s forwards; }
+        .d4 { animation: dotPop .4s cubic-bezier(.34,1.56,.64,1) 3.2s forwards; }
+        .d5 { animation: dotPop .4s cubic-bezier(.34,1.56,.64,1) 3.3s forwards; }
+        @keyframes dotPop {
+            0%  { opacity: 0; transform: scale(0); }
+            60% { opacity: 1; transform: scale(1.45); }
+            100%{ opacity: 1; transform: scale(1); }
+        }
+        .mtn-reveal { opacity: 0; animation: fadeReveal .5s ease 2.75s forwards; }
+        .coast-line { opacity: 0; animation: fadeReveal .6s ease 2.6s forwards; }
+        .map-lbl    { opacity: 0; animation: fadeReveal .8s ease 2.45s forwards; }
+        @keyframes fadeReveal { to { opacity: 1; } }
 
         /* Section common */
         .section { padding: 88px 48px; }
@@ -422,9 +480,83 @@
             </div>
         </div>
     </div>
-    <div class="hero-visual reveal reveal-delay-2">
-        <div class="hero-img-wrap">
-            <img src="/images/jatim.png" alt="Logo Provinsi Jawa Timur">
+    <div class="hero-visual">
+        <div class="map-wrap">
+            <svg class="kab-map" viewBox="0 0 360 345" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="kabFill" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="rgba(255,255,255,.22)"/>
+                        <stop offset="100%" stop-color="rgba(255,255,255,.05)"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- Subtle grid lines -->
+                <line x1="0" y1="115" x2="360" y2="115" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+                <line x1="0" y1="230" x2="360" y2="230" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+                <line x1="120" y1="0" x2="120" y2="345" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+                <line x1="240" y1="0" x2="240" y2="345" stroke="rgba(255,255,255,.07)" stroke-width="1"/>
+
+                <!-- Outer boundary Kabupaten Malang -->
+                <path class="kab-boundary"
+                    fill="url(#kabFill)"
+                    d="M 55,52
+                       C 70,32 100,18 140,12
+                       C 170,7 200,9 232,19
+                       C 260,29 290,46 315,66
+                       C 335,82 348,107 350,136
+                       C 352,162 345,192 332,220
+                       C 318,250 298,272 272,294
+                       C 248,315 218,330 185,337
+                       C 155,343 122,337 95,321
+                       C 72,308 50,285 35,257
+                       C 22,233 18,206 22,179
+                       C 26,151 34,125 47,101
+                       C 51,85 53,68 55,52 Z"/>
+
+                <!-- Kota Malang enclave -->
+                <path class="enclave-path"
+                    d="M 165,101 C 175,89 192,84 208,88 C 222,92 230,105 226,119
+                       C 222,132 208,140 192,139 C 175,138 163,127 162,113
+                       C 161,108 162,104 165,101 Z"/>
+
+                <!-- Kota Batu enclave -->
+                <path class="enclave-path delay"
+                    d="M 110,89 C 118,77 134,71 148,75 C 161,79 167,91 162,104
+                       C 157,115 143,121 129,118 C 114,115 106,103 110,91 Z"/>
+
+                <!-- Mountain symbols -->
+                <g class="mtn-reveal">
+                    <polygon points="308,91 316,77 324,91" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.3" stroke-linejoin="round"/>
+                    <text x="316" y="103" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="6.5" font-family="Plus Jakarta Sans,sans-serif">Semeru</text>
+                    <polygon points="178,35 185,23 192,35" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.3" stroke-linejoin="round"/>
+                    <text x="185" y="47" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="6.5" font-family="Plus Jakarta Sans,sans-serif">Arjuno</text>
+                    <polygon points="72,113 80,100 88,113" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.3" stroke-linejoin="round"/>
+                    <text x="80" y="125" text-anchor="middle" fill="rgba(255,255,255,.5)" font-size="6.5" font-family="Plus Jakarta Sans,sans-serif">Kawi</text>
+                </g>
+
+                <!-- Coastline accent (south) -->
+                <path class="coast-line" fill="none"
+                    stroke="rgba(255,255,255,.28)" stroke-width="1.2" stroke-dasharray="8,5"
+                    d="M 35,257 Q 62,310 95,321 Q 140,341 185,337 Q 230,333 272,294"/>
+
+                <!-- Pulse ring for Kota Malang marker -->
+                <circle class="dot-pulse" cx="192" cy="114" r="7"/>
+
+                <!-- City / district dots -->
+                <circle class="city-dot d1" cx="192" cy="114" r="5"/>  <!-- Kota Malang area -->
+                <circle class="city-dot d2" cx="134" cy="91"  r="3.5"/><!-- Kota Batu area -->
+                <circle class="city-dot d3" cx="282" cy="178" r="3.5"/><!-- Dampit / SE area -->
+                <circle class="city-dot d4" cx="88"  cy="202" r="3.5"/><!-- Kepanjen / W area -->
+                <circle class="city-dot d5" cx="188" cy="278" r="3.5"/><!-- Sumbermanjing / S area -->
+
+                <!-- Labels -->
+                <text class="map-lbl" x="192" y="200" text-anchor="middle"
+                    fill="rgba(255,255,255,.82)" font-size="11"
+                    font-family="Plus Jakarta Sans,sans-serif" font-weight="700" letter-spacing="2.5">KABUPATEN MALANG</text>
+                <text class="map-lbl" x="192" y="215" text-anchor="middle"
+                    fill="rgba(255,255,255,.48)" font-size="8.5"
+                    font-family="Plus Jakarta Sans,sans-serif" font-weight="500" letter-spacing="1.5">JAWA TIMUR</text>
+            </svg>
         </div>
     </div>
 </section>

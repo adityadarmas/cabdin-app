@@ -9,7 +9,7 @@ class ProdukController extends Controller
 {
     public function index()
     {
-        $data = Produk::latest()->paginate(9);
+        $data = Produk::with('operator')->latest()->paginate(20);
         return view('dashboard.produk.index', compact('data'));
     }
 
@@ -40,7 +40,6 @@ class ProdukController extends Controller
             'deskripsi' => 'required',
             'harga'     => 'required|numeric',
             'gambar'    => 'nullable|image|mimes:jpeg,png,jpg',
-            'is_active' => 'required|boolean',
         ]);
 
         if ($request->hasFile('gambar')) {

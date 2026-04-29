@@ -61,7 +61,7 @@
 
 <header>
     <h2>E-Cabdin</h2>
-    <h4>Selamat Datang asdasdasd {{ auth()->user()->name }}</h4>
+    <h4>Selamat Datang {{ auth()->user()->name }}</h4>
 </header>
 
 <div class="container">
