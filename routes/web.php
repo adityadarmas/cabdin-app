@@ -11,6 +11,7 @@ use App\Http\Controllers\KategoriProsedurController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\UserAccessController;
+use App\Http\Controllers\OperatorAkunController;
 use App\Http\Controllers\DapodikJadwalController;
 use App\Http\Controllers\NomorSuratSettingController;
 use App\Http\Controllers\SuratKeluarController;
@@ -71,6 +72,9 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:operator')->prefix('operator')->group(function () {
+        Route::get('/akun', [OperatorAkunController::class, 'edit'])->name('operator.akun.edit');
+        Route::put('/akun', [OperatorAkunController::class, 'update'])->name('operator.akun.update');
+
         Route::get('/produk', [ProdukController::class, 'operatorIndex'])->name('operator.produk.index');
         Route::get('/produk/{produk}', [ProdukController::class, 'show'])->name('operator.produk.show');
         Route::get('/produk/{produk}/edit', [ProdukController::class, 'operatorEdit'])->name('operator.produk.edit');

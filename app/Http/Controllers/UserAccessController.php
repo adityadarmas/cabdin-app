@@ -61,7 +61,7 @@ class UserAccessController extends Controller
             'role'     => $request->role,
         ]);
 
-        return redirect()->route('admin.dashboard')
+        return redirect()->route('admin.users.index')
                          ->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -72,10 +72,11 @@ class UserAccessController extends Controller
     public function update(Request $request, User $user)
     {
         $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'role'     => 'required|in:admin,staff,tu,pimpinan,operator',
-            'password' => 'nullable|string|min:6|confirmed',
+            'name'         => 'required|string|max:255',
+            'email'        => ['required', 'email', Rule::unique('users')->ignore($user->id)],
+            'role'         => 'required|in:admin,staff,tu,pimpinan,operator',
+            'nama_sekolah' => 'nullable|string|max:255',
+            'password'     => 'nullable|string|min:6|confirmed',
         ], [
             'name.required'      => 'Nama wajib diisi.',
             'email.required'     => 'Email wajib diisi.',
@@ -86,9 +87,10 @@ class UserAccessController extends Controller
         ]);
 
         $data = [
-            'name'  => $request->name,
-            'email' => $request->email,
-            'role'  => $request->role,
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'role'         => $request->role,
+            'nama_sekolah' => $request->role === 'operator' ? $request->nama_sekolah : null,
         ];
 
         if ($request->filled('password')) {
@@ -97,7 +99,7 @@ class UserAccessController extends Controller
 
         $user->update($data);
 
-        return redirect()->route('admin.dashboard')
+        return redirect()->route('admin.users.index')
                          ->with('success', 'User berhasil diperbarui.');
     }
 

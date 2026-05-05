@@ -10,6 +10,14 @@
             </a>
         </li>
 
+        <li>
+            <a href="{{ route('operator.akun.edit') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('operator.akun.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Edit Akun
+            </a>
+        </li>
+
         <li class="border-t border-slate-700 my-4"></li>
 
         <li>

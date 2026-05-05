@@ -4,7 +4,11 @@
       "Bash(php artisan:*)",
       "WebFetch(domain:skalaku.vercel.app)",
       "Bash(php -l app/Http/Controllers/SuratMasukController.php)",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(Get-ChildItem -Path \"d:\\\\BElajar\\\\laravelapp\\\\e-cabdin\\\\app\\\\Http\\\\Controllers\" -Filter \"*.php\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Get-ChildItem -Path \"d:\\\\BElajar\\\\laravelapp\\\\e-cabdin\\\\resources\\\\views\\\\operator\" -Recurse)",
+      "Bash(Select-Object FullName)"
     ]
   }
 }
