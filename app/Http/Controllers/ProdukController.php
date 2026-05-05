@@ -144,6 +144,12 @@ class ProdukController extends Controller
             'is_active' => 'required|boolean'
         ]);
 
+        if ($request->hasFile('gambar')) {
+            $validated['gambar'] = $request->file('gambar')->store('produk', 'public');
+        } else {
+            unset($validated['gambar']);
+        }
+
         $produk->update($validated);
 
         return redirect()
