@@ -21,7 +21,8 @@ class UserAccessController extends Controller
         $users = User::when($search, function ($query) use ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+                      ->orWhere('email', 'like', "%{$search}%")
+                      ->orWhere('nama_sekolah', 'like', "%{$search}%");
                 });
             })
             ->orderBy('created_at', 'desc')

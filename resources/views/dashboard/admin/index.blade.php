@@ -20,6 +20,37 @@
         </div>
     @endif
 
+    {{-- Search Bar --}}
+    <form method="GET" action="{{ route('admin.users.index') }}" class="mb-4 flex gap-2">
+        <div class="relative flex-1 max-w-md">
+            <span class="absolute inset-y-0 left-3 flex items-center text-gray-400">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z"/>
+                </svg>
+            </span>
+            <input type="text" name="search" value="{{ $search ?? '' }}"
+                placeholder="Cari nama, email, atau nama sekolah..."
+                class="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent">
+        </div>
+        <button type="submit"
+            class="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+            Cari
+        </button>
+        @if ($search)
+            <a href="{{ route('admin.users.index') }}"
+                class="px-4 py-2 text-sm border border-gray-200 text-gray-600 rounded-lg hover:bg-gray-50 transition font-medium">
+                Reset
+            </a>
+        @endif
+    </form>
+
+    @if ($search)
+        <p class="mb-3 text-sm text-gray-500">
+            Hasil pencarian untuk <span class="font-medium text-gray-700">"{{ $search }}"</span>
+            — {{ $users->total() }} user ditemukan
+        </p>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
