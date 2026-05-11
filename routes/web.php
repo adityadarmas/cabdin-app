@@ -26,7 +26,7 @@ use App\Http\Controllers\SuratKeluarController;
 // Route::get('/', [LandingController::class, 'error']);
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-Route::get('/all-produk', [ProdukController::class, 'allindex'])->name('produk.allindex');
+Route::get('/skalaku', [ProdukController::class, 'allindex'])->name('produk.allindex');
 
 Route::get('/prosedur/{prosedur}', [ProsedurController::class, 'show'])->name('prosedur.show');
 

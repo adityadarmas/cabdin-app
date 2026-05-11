@@ -1,63 +1,208 @@
 @extends('layouts.app')
 
+@push('styles')
+<link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+<style>
+    .ql-toolbar.ql-snow {
+        border-radius: 8px 8px 0 0;
+        border-color: #e2e8f0;
+        background: #f8fafc;
+        font-family: inherit;
+    }
+    .ql-container.ql-snow {
+        border-radius: 0 0 8px 8px;
+        border-color: #e2e8f0;
+        font-family: inherit;
+        font-size: 15px;
+    }
+    .ql-editor { min-height: 320px; line-height: 1.8; }
+    .ql-editor p { margin-bottom: 0.75em; }
+    .ql-editor.ql-blank::before { color: #94a3b8; font-style: normal; }
+    .form-section {
+        background: white; border: 1px solid #e2e8f0;
+        border-radius: 12px; padding: 24px; margin-bottom: 20px;
+    }
+    .form-section-title {
+        font-size: 13px; font-weight: 700; text-transform: uppercase;
+        letter-spacing: .06em; color: #64748b; margin-bottom: 16px;
+        padding-bottom: 10px; border-bottom: 1px solid #f1f5f9;
+    }
+    .field-label { display: block; font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .field-hint { font-size: 12px; color: #94a3b8; margin-top: 4px; }
+    .field-error { font-size: 12px; color: #ef4444; margin-top: 4px; }
+    .form-input {
+        width: 100%; border: 1px solid #e2e8f0; border-radius: 8px;
+        padding: 10px 14px; font-size: 14px; font-family: inherit;
+        color: #1e293b; transition: border-color .2s, box-shadow .2s;
+        outline: none;
+    }
+    .form-input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+    .form-input.is-error { border-color: #ef4444; }
+    .btn-submit {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: #1e40af; color: white; font-size: 14px; font-weight: 600;
+        padding: 10px 24px; border-radius: 8px; border: none; cursor: pointer;
+        transition: background .2s, transform .15s;
+    }
+    .btn-submit:hover { background: #1d4ed8; transform: translateY(-1px); }
+    .btn-cancel {
+        display: inline-flex; align-items: center; gap: 8px;
+        background: white; color: #64748b; font-size: 14px; font-weight: 600;
+        padding: 10px 24px; border-radius: 8px;
+        border: 1.5px solid #e2e8f0; transition: border-color .2s, color .2s;
+    }
+    .btn-cancel:hover { border-color: #94a3b8; color: #374151; }
+    .thumb-preview {
+        width: 100%; max-height: 200px; object-fit: cover;
+        border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 8px; display: none;
+    }
+    .upload-area {
+        border: 2px dashed #e2e8f0; border-radius: 8px; padding: 20px;
+        text-align: center; cursor: pointer; transition: border-color .2s, background .2s;
+    }
+    .upload-area:hover { border-color: #3b82f6; background: #eff6ff; }
+    .upload-area input[type="file"] { display: none; }
+    .upload-icon { color: #94a3b8; margin: 0 auto 8px; }
+    .upload-text { font-size: 13px; color: #64748b; }
+    .upload-hint { font-size: 11px; color: #94a3b8; margin-top: 4px; }
+    .char-count { font-size: 12px; color: #94a3b8; text-align: right; margin-top: 4px; }
+</style>
+@endpush
+
 @section('content')
-<div class="container">
+<div class="max-w-3xl">
 
-    <h3 class="mb-3">Tambah Berita</h3>
+    <div class="flex items-center gap-3 mb-6">
+        <a href="{{ route('berita.index') }}" class="text-slate-400 hover:text-slate-600">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </a>
+        <div>
+            <h1 class="text-xl font-bold text-slate-800">Tambah Berita</h1>
+            <p class="text-sm text-slate-500 mt-0.5">Buat artikel berita baru untuk ditampilkan di halaman publik</p>
+        </div>
+    </div>
 
-    <form action="{{ route('berita.store') }}"
-          method="POST"
-          enctype="multipart/form-data">
+    <form action="{{ route('berita.store') }}" method="POST" enctype="multipart/form-data" id="berita-form">
         @csrf
 
-        <div class="mb-3">
-            <label class="form-label">Judul</label>
-            <input type="text"
-                   name="judul"
-                   class="form-control @error('judul') is-invalid @enderror"
-                   value="{{ old('judul') }}">
-            @error('judul')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
+        {{-- Informasi Dasar --}}
+        <div class="form-section">
+            <div class="form-section-title">Informasi Artikel</div>
+
+            <div class="mb-4">
+                <label class="field-label">Judul Berita <span class="text-red-500">*</span></label>
+                <input type="text" name="judul" id="judul-input"
+                       class="form-input {{ $errors->has('judul') ? 'is-error' : '' }}"
+                       value="{{ old('judul') }}"
+                       placeholder="Tulis judul berita yang menarik..."
+                       maxlength="255">
+                <div class="char-count"><span id="judul-count">0</span>/255</div>
+                @error('judul')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
+
+            <div>
+                <label class="field-label">Tanggal Publikasi <span class="text-red-500">*</span></label>
+                <input type="date" name="tanggal"
+                       class="form-input {{ $errors->has('tanggal') ? 'is-error' : '' }}"
+                       value="{{ old('tanggal', date('Y-m-d')) }}"
+                       style="max-width: 220px;">
+                @error('tanggal')
+                    <div class="field-error">{{ $message }}</div>
+                @enderror
+            </div>
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Tanggal</label>
-            <input type="date"
-                   name="tanggal"
-                   class="form-control @error('tanggal') is-invalid @enderror"
-                   value="{{ old('tanggal') }}">
-            @error('tanggal')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-
-        <div class="mb-3">
-            <label class="form-label">Konten</label>
-            <textarea name="konten"
-                      rows="5"
-                      class="form-control @error('konten') is-invalid @enderror">{{ old('konten') }}</textarea>
+        {{-- Konten --}}
+        <div class="form-section">
+            <div class="form-section-title">Isi Konten</div>
+            <label class="field-label">Konten Berita <span class="text-red-500">*</span></label>
+            <div id="quill-editor"></div>
+            <textarea name="konten" id="konten-input" style="display:none;">{{ old('konten') }}</textarea>
+            <div class="field-hint">Gunakan toolbar di atas untuk memformat teks: heading, tebal, miring, daftar, kutipan, dan tautan.</div>
             @error('konten')
-                <div class="invalid-feedback">{{ $message }}</div>
+                <div class="field-error">{{ $message }}</div>
             @enderror
         </div>
 
-        <div class="mb-3">
-            <label class="form-label">Thumbnail (Opsional)</label>
-            <input type="file"
-                   name="thumbnail"
-                   class="form-control @error('thumbnail') is-invalid @enderror">
+        {{-- Thumbnail --}}
+        <div class="form-section">
+            <div class="form-section-title">Gambar Thumbnail</div>
+            <label class="field-label">Foto Sampul <span class="text-slate-400 font-normal">(opsional)</span></label>
+            <div class="upload-area" onclick="document.getElementById('thumbnail-input').click()">
+                <input type="file" name="thumbnail" id="thumbnail-input"
+                       accept="image/jpeg,image/png,image/jpg,image/gif"
+                       onchange="previewThumb(this)">
+                <div class="upload-icon">
+                    <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <div class="upload-text">Klik untuk pilih gambar</div>
+                <div class="upload-hint">JPG, PNG, GIF · Maks. 2 MB · Rekomendasi 1200×630 px</div>
+            </div>
+            <img id="thumb-preview" class="thumb-preview" alt="Preview">
             @error('thumbnail')
-                <div class="invalid-feedback">{{ $message }}</div>
+                <div class="field-error">{{ $message }}</div>
             @enderror
         </div>
 
-        <button class="btn btn-primary">Simpan</button>
-        <a href="{{ route('berita.index') }}" class="btn btn-secondary">
-            Kembali
-        </a>
+        {{-- Actions --}}
+        <div class="flex items-center gap-3 pb-8">
+            <button type="submit" class="btn-submit">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+                Simpan Berita
+            </button>
+            <a href="{{ route('berita.index') }}" class="btn-cancel">Batal</a>
+        </div>
 
     </form>
-
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+<script>
+    var quill = new Quill('#quill-editor', {
+        theme: 'snow',
+        placeholder: 'Tulis isi berita di sini...',
+        modules: {
+            toolbar: [
+                [{ 'header': [2, 3, false] }],
+                ['bold', 'italic', 'underline'],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                ['blockquote', 'link'],
+                ['clean']
+            ]
+        }
+    });
+
+    // Pre-fill from old() input if validation failed
+    var oldContent = document.getElementById('konten-input').value;
+    if (oldContent) quill.root.innerHTML = oldContent;
+
+    // Sync to hidden textarea on submit
+    document.getElementById('berita-form').addEventListener('submit', function () {
+        document.getElementById('konten-input').value = quill.root.innerHTML;
+    });
+
+    // Judul character counter
+    var judulInput = document.getElementById('judul-input');
+    var judulCount = document.getElementById('judul-count');
+    function updateCount() { judulCount.textContent = judulInput.value.length; }
+    judulInput.addEventListener('input', updateCount);
+    updateCount();
+
+    // Thumbnail preview
+    function previewThumb(input) {
+        var preview = document.getElementById('thumb-preview');
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
+@endpush
