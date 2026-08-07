@@ -13,6 +13,20 @@
                 Manajemen User
             </a>
         </li>
+        <li>
+            <a href="{{ route('admin.pengajuan.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('admin.pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Pengajuan Operator
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('jenis-pengajuan.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('jenis-pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Jenis Pengajuan
+            </a>
+        </li>
         <!-- Dashboard berita-->
         <li>
             <a href="{{ route('berita.index') }}"

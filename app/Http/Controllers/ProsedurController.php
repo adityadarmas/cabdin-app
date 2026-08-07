@@ -6,6 +6,7 @@ use App\Models\DapodikJadwal;
 use App\Models\KategoriProsedur;
 use App\Models\Prosedur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProsedurController extends Controller
 {
@@ -36,6 +37,22 @@ class ProsedurController extends Controller
         return view('prosedur.show', compact('prosedur', 'related'));
     }
 
+    public function category(KategoriProsedur $kategoriProsedur)
+    {
+        abort_unless($kategoriProsedur->is_active, 404);
+
+        $kategoriProsedur->load('prosedursAktif');
+        $dapodikJadwals = collect();
+
+        if (str_contains(strtolower($kategoriProsedur->nama), 'dapodik')) {
+            $dapodikJadwals = DapodikJadwal::whereIn('jenis', ['edit_ptk', 'tambah_ptk'])
+                ->get()
+                ->keyBy('jenis');
+        }
+
+        return view('prosedur.category', compact('kategoriProsedur', 'dapodikJadwals'));
+    }
+
     public function create()
     {
         $kategori = KategoriProsedur::where('is_active', true)->orderBy('urutan')->get();
@@ -48,9 +65,14 @@ class ProsedurController extends Controller
             'kategori_id' => 'required|exists:kategori_prosedurs,id',
             'judul'       => 'required|string|max:255',
             'deskripsi'   => 'required',
+            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'urutan'      => 'required|integer|min:1',
             'is_active'   => 'required|boolean',
         ]);
+
+        if ($request->hasFile('thumbnail')) {
+            $validated['thumbnail'] = $request->file('thumbnail')->store('prosedur', 'public');
+        }
 
         Prosedur::create($validated);
 
@@ -71,9 +93,18 @@ class ProsedurController extends Controller
             'kategori_id' => 'required|exists:kategori_prosedurs,id',
             'judul'       => 'required|string|max:255',
             'deskripsi'   => 'required',
+            'thumbnail'   => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
             'urutan'      => 'required|integer|min:1',
             'is_active'   => 'required|boolean',
         ]);
+
+        if ($request->hasFile('thumbnail')) {
+            if ($prosedur->thumbnail) {
+                Storage::disk('public')->delete($prosedur->thumbnail);
+            }
+
+            $validated['thumbnail'] = $request->file('thumbnail')->store('prosedur', 'public');
+        }
 
         $prosedur->update($validated);
 
@@ -84,6 +115,10 @@ class ProsedurController extends Controller
 
     public function destroy(Prosedur $prosedur)
     {
+        if ($prosedur->thumbnail) {
+            Storage::disk('public')->delete($prosedur->thumbnail);
+        }
+
         $prosedur->delete();
 
         return redirect()

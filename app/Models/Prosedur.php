@@ -10,6 +10,7 @@ class Prosedur extends Model
         'kategori_id',
         'judul',
         'deskripsi',
+        'thumbnail',
         'urutan',
         'is_active',
     ];

@@ -56,9 +56,38 @@
         }
         .nav-logo-box img { width: 100%; height: 100%; object-fit: contain; }
         .nav-brand-name { font-size: 15px; font-weight: 800; color: white; letter-spacing: .04em; }
-        .nav-links { display: flex; gap: 28px; }
+        .nav-links { display: flex; align-items: center; gap: 28px; }
         .nav-links a { font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,.8); transition: color .2s; }
         .nav-links a:hover { color: white; }
+        .nav-dropdown { position: relative; }
+        .nav-dropdown::after {
+            content: ''; position: absolute; top: 100%; left: -16px; right: -16px;
+            height: 18px;
+        }
+        .nav-dropdown-toggle { display: inline-flex; align-items: center; gap: 5px; }
+        .nav-dropdown-toggle svg { width: 14px; height: 14px; transition: transform .2s ease; }
+        .nav-dropdown:hover .nav-dropdown-toggle svg,
+        .nav-dropdown:focus-within .nav-dropdown-toggle svg { transform: rotate(180deg); }
+        .nav-dropdown-menu {
+            position: absolute; top: calc(100% + 14px); left: 50%; width: 230px;
+            padding: 8px; border-radius: 12px; background: white;
+            box-shadow: 0 16px 36px rgba(29, 56, 126, .22);
+            border: 1px solid rgba(255,255,255,.35); transform: translateX(-50%) translateY(-6px);
+            opacity: 0; visibility: hidden; pointer-events: none;
+            transition: opacity .18s ease, transform .18s ease, visibility .18s;
+        }
+        .nav-dropdown:hover .nav-dropdown-menu,
+        .nav-dropdown:focus-within .nav-dropdown-menu {
+            opacity: 1; visibility: visible; pointer-events: auto; transform: translateX(-50%) translateY(0);
+        }
+        .nav-dropdown-menu::before {
+            content: ''; position: absolute; top: -6px; left: 50%; width: 12px; height: 12px;
+            background: white; transform: translateX(-50%) rotate(45deg); border-left: 1px solid var(--border); border-top: 1px solid var(--border);
+        }
+        .nav-dropdown-menu a { position: relative; z-index: 1; display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px; color: var(--text); font-size: 12.5px; }
+        .nav-dropdown-menu a:hover { color: var(--purple); background: var(--bg2); }
+        .nav-dropdown-menu a:first-child { color: var(--purple); font-weight: 700; border-bottom: 1px solid var(--border); border-radius: 0; margin: 0 2px 4px; padding-left: 8px; }
+        .nav-dropdown-dot { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--grad); }
         .nav-cta {
             font-size: 13px; font-weight: 700; padding: 8px 20px;
             background: rgba(255,255,255,.18); color: white; border-radius: var(--radius-pill);
@@ -320,7 +349,8 @@
             background: var(--grad);
             overflow: hidden; display: flex; align-items: center; justify-content: center;
         }
-        .berita-featured-img img { width: 100%; height: 100%; object-fit: cover; }
+        .berita-featured-img img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+        .berita-featured:hover .berita-featured-img img { transform: scale(1.06); }
         .berita-featured-body { padding: 28px; }
         .berita-cat {
             display: inline-block; font-size: 10px; font-weight: 700;
@@ -442,7 +472,24 @@
     <div class="nav-links">
         <a href="#layanan">Layanan</a>
         <a href="#produk">Produk</a>
+        @if($kategoriProsedur->isNotEmpty())
+        <div class="nav-dropdown">
+            <a href="#prosedur" class="nav-dropdown-toggle" aria-haspopup="true">
+                Prosedur
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </a>
+            <div class="nav-dropdown-menu" role="menu" aria-label="Kategori prosedur">
+                <a href="#prosedur" role="menuitem">Semua Prosedur</a>
+                @foreach($kategoriProsedur as $kat)
+                <a href="{{ route('prosedur.category', $kat) }}" role="menuitem">
+                    <span class="nav-dropdown-dot"></span>{{ $kat->nama }}
+                </a>
+                @endforeach
+            </div>
+        </div>
+        @else
         <a href="#prosedur">Prosedur</a>
+        @endif
         <a href="#berita">Berita</a>
         <a href="#staff">Staff</a>
     </div>
@@ -667,7 +714,8 @@
         <p class="section-desc reveal reveal-delay-2">Panduan lengkap untuk mengakses layanan kami dengan mudah dan transparan.</p>
     </div>
     @if($kategoriProsedur->isNotEmpty())
-    <div x-data="{ activeTab: {{ $kategoriProsedur->first()->id ?? 0 }} }">
+    <div x-data="{ activeTab: {{ $kategoriProsedur->first()->id ?? 0 }} }"
+         @select-prosedur-category.window="activeTab = $event.detail">
         <div class="prosedur-tabs">
             @foreach($kategoriProsedur as $kat)
             <button
@@ -687,7 +735,8 @@
             x-transition:enter-end="opacity-100 translate-y-0"
             x-cloak>
 
-            @if(str_contains(strtolower($kat->nama), 'dapodik'))
+            {{-- Jadwal Dapodik ditampilkan pada halaman kategori Dapodik. --}}
+            @if(false)
             <div class="dapodik-grid">
                 @foreach(['edit_ptk' => 'Edit PTK', 'tambah_ptk' => 'Tambah PTK'] as $jenis => $label)
                 @php $jadwal = $dapodikJadwals[$jenis] ?? null; @endphp
@@ -723,7 +772,7 @@
             @if($kat->prosedursAktif->isNotEmpty())
             <div class="prosedur-grid">
                 @foreach($kat->prosedursAktif as $i => $item)
-                <a href="{{ route('prosedur.show', $item->id) }}" class="prosedur-card">
+                <a href="{{ route('prosedur.category', $kat) }}" class="prosedur-card">
                     <div class="prosedur-num">{{ $i + 1 }}</div>
                     <div class="prosedur-title">{{ $item->judul }}</div>
                     <div class="prosedur-desc">{{ $item->deskripsi }}</div>
@@ -1014,6 +1063,11 @@
             const href = this.getAttribute('href');
             if (href.length <= 1) return;
             e.preventDefault();
+            if (this.dataset.prosedurCategory) {
+                window.dispatchEvent(new CustomEvent('select-prosedur-category', {
+                    detail: Number(this.dataset.prosedurCategory)
+                }));
+            }
             const target = document.querySelector(href);
             if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });

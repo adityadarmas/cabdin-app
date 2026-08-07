@@ -63,6 +63,11 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\Produk::class, 'user_id');
     }
 
+    public function pengajuans()
+    {
+        return $this->hasMany(\App\Models\Pengajuan::class, 'user_id');
+    }
+
     // fungsi role per user
     public function isTU()
     {

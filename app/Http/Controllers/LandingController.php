@@ -13,7 +13,11 @@ class LandingController extends Controller
     {
         // Jika sudah login → langsung ke dashboard
         if (auth()->check()) {
-            return redirect()->route('surat-masuk.index');
+            return redirect()->route(match (auth()->user()->role) {
+                'admin' => 'admin.users.index',
+                'operator' => 'operator.pengajuan.index',
+                default => 'surat-masuk.index',
+            });
         }
 
         return view('landing', [

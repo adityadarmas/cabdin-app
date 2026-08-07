@@ -17,7 +17,7 @@ class RoleMiddleware
             $role = auth()->user()->role;
             $redirect = match ($role) {
                 'admin'    => route('admin.users.index'),
-                'operator' => route('operator.produk.index'),
+                'operator' => route('operator.pengajuan.index'),
                 default    => route('surat-masuk.index'),
             };
             return redirect($redirect);

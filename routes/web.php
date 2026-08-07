@@ -15,6 +15,9 @@ use App\Http\Controllers\OperatorAkunController;
 use App\Http\Controllers\DapodikJadwalController;
 use App\Http\Controllers\NomorSuratSettingController;
 use App\Http\Controllers\SuratKeluarController;
+use App\Http\Controllers\OperatorPengajuanController;
+use App\Http\Controllers\AdminPengajuanController;
+use App\Http\Controllers\JenisPengajuanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +31,7 @@ Route::get('/', [LandingController::class, 'index'])->name('landing');
 
 Route::get('/skalaku', [ProdukController::class, 'allindex'])->name('produk.allindex');
 
+Route::get('/prosedur/kategori/{kategoriProsedur}', [ProsedurController::class, 'category'])->name('prosedur.category');
 Route::get('/prosedur/{prosedur}', [ProsedurController::class, 'show'])->name('prosedur.show');
 
 Route::get('/berita', [BeritaController::class, 'publicIndex'])->name('berita.all');
@@ -80,6 +84,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/produk/{produk}/edit', [ProdukController::class, 'operatorEdit'])->name('operator.produk.edit');
         Route::put('/produk/{produk}', [ProdukController::class, 'operatorUpdate'])->name('operator.produk.update');
         Route::delete('/produk/{produk}', [ProdukController::class, 'operatorDestroy'])->name('operator.produk.destroy');
+
+        Route::resource('pengajuan', OperatorPengajuanController::class)
+            ->except(['show'])
+            ->names('operator.pengajuan');
     });
 
     Route::resource('surat-masuk', SuratMasukController::class);
@@ -110,6 +118,11 @@ Route::middleware('auth')->group(function () {
 
     // ================== ADMIN ==================
     Route::middleware('role:admin')->prefix('admin')->group(function () {
+
+        Route::get('/pengajuan', [AdminPengajuanController::class, 'index'])->name('admin.pengajuan.index');
+        Route::get('/pengajuan/export', [AdminPengajuanController::class, 'export'])->name('admin.pengajuan.export');
+        Route::put('/pengajuan/{pengajuan}', [AdminPengajuanController::class, 'update'])->name('admin.pengajuan.update');
+        Route::resource('jenis-pengajuan', JenisPengajuanController::class)->except(['show']);
 
         Route::get('/register', [RegisterController::class, 'showRegister'])->name('admin.register');
         Route::post('/register', [RegisterController::class, 'register']);

@@ -1,3 +1,15 @@
+@php
+    $detail = $detail ?? [];
+    $detailIndexUrl = $detail['index_url'] ?? route('landing').'#berita';
+    $detailIndexLabel = $detail['index_label'] ?? 'Berita';
+    $detailHeroCategory = $detail['hero_category'] ?? 'Berita & Informasi';
+    $detailMetaLabel = $detail['meta_label'] ?? 'Admin Cabdin';
+    $detailRelatedTitle = $detail['related_title'] ?? 'Berita Lainnya';
+    $detailShowRoute = $detail['show_route'] ?? 'berita.show';
+    $detailContentLabel = $detail['content_label'] ?? null;
+    $detailShareLabel = $detail['share_label'] ?? 'Bagikan artikel ini';
+    $detailDatePrefix = $detail['date_prefix'] ?? null;
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -118,7 +130,8 @@
             box-shadow: 0 24px 64px rgba(59,111,232,.2);
             border: 1px solid var(--border);
         }
-        .thumbnail-wrap img { width: 100%; max-height: 480px; object-fit: cover; }
+        .thumbnail-wrap img { width: 100%; max-height: 480px; object-fit: cover; transition: transform .45s ease; }
+        .thumbnail-wrap:hover img { transform: scale(1.045); }
         .no-thumbnail { margin-top: 40px; }
 
         /* Article card */
@@ -130,6 +143,12 @@
 
         /* Article typography */
         .article { color: var(--text); }
+        .article-label {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 11px; font-weight: 800; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--purple); margin-bottom: 20px;
+        }
+        .article-label::before { content: ''; width: 22px; height: 3px; border-radius: 3px; background: var(--grad); }
 
         .article > p:first-of-type {
             font-size: 18px; line-height: 1.85; color: #2d3748;
@@ -260,7 +279,8 @@
             overflow: hidden; display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
         }
-        .related-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .related-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform .35s ease; }
+        .related-card:hover .related-thumb img { transform: scale(1.08); }
         .related-body { padding: 18px; flex: 1; display: flex; flex-direction: column; }
         .related-date {
             font-size: 11px; font-weight: 700; letter-spacing: .07em;
@@ -333,7 +353,7 @@
         <div class="nav-logo-box"><img src="{{ asset('favicon.png') }}" alt="E-Cabdin"></div>
         <span class="nav-brand-name">E-CABDIN</span>
     </a>
-    <a href="{{ route('landing') }}#berita" class="nav-back">
+    <a href="{{ $detailIndexUrl }}" class="nav-back">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M19 12H5M12 5l-7 7 7 7"/>
         </svg>
@@ -347,21 +367,21 @@
         <div class="hero-breadcrumb">
             <a href="{{ route('landing') }}">Beranda</a>
             <span class="sep">/</span>
-            <a href="{{ route('landing') }}#berita">Berita</a>
+            <a href="{{ $detailIndexUrl }}">{{ $detailIndexLabel }}</a>
             <span class="sep">/</span>
             <span style="color:rgba(255,255,255,.88);">{{ Str::limit($berita->judul, 45) }}</span>
         </div>
-        <span class="hero-cat">Berita &amp; Informasi</span>
+        <span class="hero-cat">{{ $detailHeroCategory }}</span>
         <h1 class="hero-title">{{ $berita->judul }}</h1>
         <div class="hero-meta">
             <div class="hero-meta-item">
                 <svg viewBox="0 0 24 24"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                {{ \Carbon\Carbon::parse($berita->tanggal)->translatedFormat('d F Y') }}
+                @if($detailDatePrefix){{ $detailDatePrefix }} · @endif{{ \Carbon\Carbon::parse($berita->tanggal)->translatedFormat('d F Y') }}
             </div>
             <div class="hero-meta-sep"></div>
             <div class="hero-meta-item">
                 <svg viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-                Admin Cabdin
+                {{ $detailMetaLabel }}
             </div>
             <div class="hero-meta-sep"></div>
             <div class="hero-meta-item" id="read-time-wrap" style="display:none;">
@@ -385,11 +405,14 @@
 
     <div class="article-card" id="article-card">
         <article class="article" id="article-content">
+            @if($detailContentLabel)
+            <div class="article-label">{{ $detailContentLabel }}</div>
+            @endif
             {!! $berita->konten !!}
         </article>
 
         <div class="action-bar">
-            <span class="action-bar-label">Bagikan artikel ini</span>
+            <span class="action-bar-label">{{ $detailShareLabel }}</span>
             <div class="action-btns">
                 <button class="action-btn" id="copy-btn" onclick="copyLink()">
                     <svg viewBox="0 0 24 24"><path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -410,12 +433,12 @@
     @if($related->count() > 0)
     <div class="related-section">
         <div class="related-header">
-            <div class="related-eyebrow">Berita Lainnya</div>
-            <a href="{{ route('landing') }}#berita" class="related-all">Lihat Semua &rarr;</a>
+            <div class="related-eyebrow">{{ $detailRelatedTitle }}</div>
+            <a href="{{ $detailIndexUrl }}" class="related-all">Lihat Semua &rarr;</a>
         </div>
         <div class="related-grid">
             @foreach($related as $item)
-            <a href="{{ route('berita.show', $item->id) }}" class="related-card">
+            <a href="{{ route($detailShowRoute, $item->id) }}" class="related-card">
                 <div class="related-thumb">
                     @if($item->thumbnail)
                         <img src="{{ asset('storage/'.$item->thumbnail) }}" alt="{{ $item->judul }}">
@@ -468,7 +491,7 @@
                 <a href="{{ route('landing') }}">Beranda</a>
                 <a href="{{ route('landing') }}#layanan">Layanan</a>
                 <a href="{{ route('landing') }}#prosedur">Prosedur</a>
-                <a href="{{ route('landing') }}#berita">Berita</a>
+                <a href="{{ $detailIndexUrl }}">{{ $detailIndexLabel }}</a>
                 <a href="{{ route('landing') }}#staff">Organisasi</a>
             </div>
         </div>

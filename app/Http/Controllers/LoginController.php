@@ -25,7 +25,7 @@ class LoginController extends Controller
             $role = auth()->user()->role;
             $default = match ($role) {
                 'admin'    => route('admin.users.index'),
-                'operator' => route('operator.produk.index'),
+                'operator' => route('operator.pengajuan.index'),
                 default    => route('surat-masuk.index'),
             };
 

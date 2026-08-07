@@ -11,6 +11,14 @@
         </li>
 
         <li>
+            <a href="{{ route('operator.pengajuan.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('operator.pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Pengajuan Saya
+            </a>
+        </li>
+
+        <li>
             <a href="{{ route('operator.akun.edit') }}"
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('operator.akun.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
