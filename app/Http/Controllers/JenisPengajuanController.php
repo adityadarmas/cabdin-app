@@ -9,7 +9,7 @@ class JenisPengajuanController extends Controller
 {
     public function index()
     {
-        $jenisPengajuans = JenisPengajuan::orderBy('urutan')->get();
+        $jenisPengajuans = JenisPengajuan::withCount('pengajuans')->orderBy('urutan')->get();
         return view('dashboard.jenis_pengajuan.index', compact('jenisPengajuans'));
     }
 
@@ -37,13 +37,25 @@ class JenisPengajuanController extends Controller
 
     public function destroy(JenisPengajuan $jenisPengajuan)
     {
+        if ($jenisPengajuan->pengajuans()->exists()) {
+            return back()->with('error', 'Jenis pengajuan tidak dapat dihapus karena masih memiliki riwayat atau antrian pengajuan. Ubah status menjadi Nonaktif agar tidak dapat dipilih untuk pengajuan baru.');
+        }
+
         $jenisPengajuan->delete();
         return back()->with('success', 'Jenis pengajuan berhasil dihapus.');
     }
 
     private function validated(Request $request): array
     {
-        $data = $request->validate(['nama' => 'required|string|max:255', 'deskripsi' => 'nullable|string|max:2000', 'form_fields' => 'nullable|string', 'urutan' => 'required|integer|min:1', 'is_active' => 'required|boolean']);
+        $data = $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string|max:2000',
+            'form_fields' => 'nullable|string',
+            'urutan' => 'required|integer|min:1',
+            'is_active' => 'required|boolean',
+            'is_keterangan_enabled' => 'required|boolean',
+            'is_lampiran_enabled' => 'required|boolean',
+        ]);
         $data['form_fields'] = $this->normaliseFields($data['form_fields'] ?? '');
         return $data;
     }

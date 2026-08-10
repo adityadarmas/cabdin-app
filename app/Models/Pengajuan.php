@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Pengajuan extends Model
 {
     protected $fillable = [
-        'user_id', 'jenis_pengajuan_id', 'judul', 'isi', 'lampiran', 'status', 'keterangan_admin', 'submitted_at',
+        'user_id', 'jenis_pengajuan_id', 'judul', 'isi', 'lampiran', 'data_tambahan', 'status', 'keterangan_admin', 'submitted_at',
     ];
 
     protected $casts = [

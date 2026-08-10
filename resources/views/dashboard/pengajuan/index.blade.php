@@ -1,16 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-@php($statusStyle=['menunggu'=>'bg-amber-100 text-amber-700','diproses'=>'bg-blue-100 text-blue-700','disetujui'=>'bg-emerald-100 text-emerald-700','ditolak'=>'bg-red-100 text-red-700'])
-<div class="max-w-7xl mx-auto">
-    <div class="mb-6"><h1 class="text-2xl font-extrabold text-slate-800">Pengajuan Operator</h1><p class="mt-1 text-sm text-slate-500">Tinjau dokumen dan perbarui status setiap pengajuan dari sekolah.</p></div>
-    <form class="mb-5 flex flex-wrap items-center gap-3" method="GET">
-        <select name="jenis_pengajuan_id" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"><option value="">Semua jenis pengajuan</option>@foreach($jenisPengajuans as $jenis)<option value="{{ $jenis->id }}" @selected((string) request('jenis_pengajuan_id') === (string) $jenis->id)>{{ $jenis->nama }}</option>@endforeach</select>
-        <select name="status" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm"><option value="">Semua status</option>@foreach(['menunggu'=>'Menunggu','diproses'=>'Diproses','disetujui'=>'Disetujui','ditolak'=>'Ditolak'] as $value=>$label)<option value="{{ $value }}" @selected(request('status')===$value)>{{ $label }}</option>@endforeach</select>
-        <button class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50">Filter</button>
-        @if(request('status') || request('jenis_pengajuan_id'))<a class="text-xs font-bold text-blue-600 hover:underline" href="{{ route('admin.pengajuan.index') }}">Reset filter</a>@endif
-        <a href="{{ route('admin.pengajuan.export', request()->only(['jenis_pengajuan_id', 'status'])) }}" class="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-bold text-white hover:bg-emerald-700">Export CSV</a>
-    </form>
-    <div class="space-y-4">@forelse($pengajuans as $item)<article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"><div class="flex flex-col justify-between gap-4 lg:flex-row"><div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-2"><h2 class="font-extrabold text-slate-800">{{ $item->jenisPengajuan?->nama ?? $item->judul }}</h2><span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusStyle[$item->status] }}">{{ ucfirst($item->status) }}</span></div><p class="mt-1 text-xs text-slate-500">{{ $item->operator->name }} @if($item->operator->nama_sekolah) · {{ $item->operator->nama_sekolah }} @endif · {{ $item->submitted_at?->translatedFormat('d F Y H:i') }}</p><p class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-600">{{ $item->isi }}</p>@if($item->lampiran)<a class="mt-3 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50" target="_blank" href="{{ asset('storage/'.$item->lampiran) }}">Buka lampiran</a>@endif</div><form class="w-full rounded-xl bg-slate-50 p-4 lg:w-80" method="POST" action="{{ route('admin.pengajuan.update',$item) }}">@csrf @method('PUT')<label class="mb-1 block text-xs font-bold text-slate-600">Status Pengajuan</label><select class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" name="status">@foreach(['menunggu'=>'Menunggu','diproses'=>'Diproses','disetujui'=>'Disetujui','ditolak'=>'Ditolak'] as $value=>$label)<option value="{{ $value }}" @selected($item->status===$value)>{{ $label }}</option>@endforeach</select><label class="mb-1 mt-3 block text-xs font-bold text-slate-600">Keterangan untuk operator</label><textarea class="min-h-24 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" name="keterangan_admin" placeholder="Tambahkan catatan atau alasan status...">{{ $item->keterangan_admin }}</textarea><button class="mt-3 w-full rounded-lg bg-blue-600 py-2.5 text-sm font-bold text-white hover:bg-blue-700">Simpan Status</button></form></div></article>@empty<div class="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center text-sm text-slate-400">Tidak ada pengajuan untuk filter ini.</div>@endforelse</div><div class="mt-5">{{ $pengajuans->links() }}</div>
-</div>
+    <div class="max-w-6xl mx-auto">
+        <div class="mb-6">
+            <h1 class="text-2xl font-extrabold text-slate-800">Pengajuan Operator</h1>
+            <p class="mt-1 text-sm text-slate-500">Pilih jenis pengajuan untuk meninjau antrian dan memperbarui statusnya.</p>
+        </div>
+
+        <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            @forelse ($jenisPengajuans as $jenis)
+                <a href="{{ route('admin.pengajuan.jenis', $jenis) }}" class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="grid h-11 w-11 place-items-center rounded-xl bg-blue-50 text-sm font-extrabold text-blue-600 transition group-hover:bg-blue-600 group-hover:text-white">{{ $loop->iteration }}</div>
+                        @if ($jenis->menunggu_pengajuans_count)
+                            <span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-extrabold text-amber-700">{{ $jenis->menunggu_pengajuans_count }} menunggu</span>
+                        @else
+                            <span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-extrabold text-emerald-700">Tidak ada antrian</span>
+                        @endif
+                    </div>
+                    <h2 class="mt-4 text-base font-extrabold leading-6 text-slate-800">{{ $jenis->nama }}</h2>
+                    <p class="mt-2 min-h-10 text-xs leading-5 text-slate-500">{{ $jenis->deskripsi ?: 'Buka untuk meninjau pengajuan operator.' }}</p>
+                    <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
+                        <span class="text-xs font-semibold text-slate-500">{{ $jenis->total_pengajuans_count }} total pengajuan</span>
+                        <span class="text-xs font-bold text-blue-600">Buka antrian →</span>
+                    </div>
+                </a>
+            @empty
+                <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400 md:col-span-2 xl:col-span-3">Belum ada jenis pengajuan.</div>
+            @endforelse
+        </div>
+    </div>
 @endsection

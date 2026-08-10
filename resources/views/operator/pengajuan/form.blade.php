@@ -34,15 +34,21 @@
         </section>
         @endif
         @endforeach
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><label class="mb-2 block text-sm font-bold text-slate-700">Keterangan <span class="text-red-500">*</span></label><textarea class="min-h-52 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm leading-7 focus:border-blue-500 focus:outline-none" name="isi" placeholder="Tuliskan keterangan pengajuan secara lengkap...">{{ old('isi',$pengajuan->isi) }}</textarea>@error('isi')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror</div>
-        <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"><label class="mb-2 block text-sm font-bold text-slate-700">Lampiran <span class="font-normal text-slate-400">(opsional)</span></label><input class="block w-full rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-600" name="lampiran" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><p class="mt-2 text-xs text-slate-400">Format JPG, PNG, WEBP, atau PDF. Maksimal 5 MB.</p>@if($pengajuan->lampiran)<a target="_blank" class="mt-2 inline-block text-xs font-bold text-blue-600 hover:underline" href="{{ asset('storage/'.$pengajuan->lampiran) }}">Lihat lampiran saat ini</a>@endif @error('lampiran')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror</div>
+        @foreach($jenisPengajuans as $jenis)
+            @if($jenis->is_keterangan_enabled)
+                <div class="keterangan-fields hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" data-jenis="{{ $jenis->id }}"><label class="mb-2 block text-sm font-bold text-slate-700">Keterangan <span class="text-red-500">*</span></label><textarea disabled data-keterangan-input class="min-h-52 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm leading-7 focus:border-blue-500 focus:outline-none" name="isi" placeholder="Tuliskan keterangan pengajuan secara lengkap...">{{ old('isi',$pengajuan->isi) }}</textarea>@error('isi')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror</div>
+            @endif
+            @if($jenis->is_lampiran_enabled)
+                <div class="lampiran-fields hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-sm" data-jenis="{{ $jenis->id }}"><label class="mb-2 block text-sm font-bold text-slate-700">Lampiran <span class="font-normal text-slate-400">(opsional)</span></label><input disabled data-lampiran-input class="block w-full rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-600" name="lampiran" type="file" accept="image/jpeg,image/png,image/webp,application/pdf"><p class="mt-2 text-xs text-slate-400">Format JPG, PNG, WEBP, atau PDF. Maksimal 5 MB.</p>@if($pengajuan->lampiran)<a target="_blank" class="mt-2 inline-block text-xs font-bold text-blue-600 hover:underline" href="{{ asset('storage/'.$pengajuan->lampiran) }}">Lihat lampiran saat ini</a>@endif @error('lampiran')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror</div>
+            @endif
+        @endforeach
         <button class="rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700">Kirim Pengajuan</button><a class="ml-3 text-sm font-bold text-slate-500" href="{{ route('operator.pengajuan.index') }}">Batal</a>
     </form>
 </div>
 @push('scripts')
 <script>
     const typeSelect=document.getElementById('jenis-pengajuan'), guide=document.getElementById('petunjuk-jenis'), guideText=document.getElementById('petunjuk-text');
-    function updateGuide(){const option=typeSelect.options[typeSelect.selectedIndex], description=option?.dataset.description||'', id=typeSelect.value; guide.classList.toggle('hidden',!description); guideText.textContent=description; document.querySelectorAll('.dynamic-fields').forEach(section=>{const active=section.dataset.jenis===id;section.classList.toggle('hidden',!active);section.querySelectorAll('[data-dynamic-input]').forEach(input=>input.disabled=!active);});}
+    function updateGuide(){const option=typeSelect.options[typeSelect.selectedIndex], description=option?.dataset.description||'', id=typeSelect.value; guide.classList.toggle('hidden',!description); guideText.textContent=description; document.querySelectorAll('.dynamic-fields, .keterangan-fields, .lampiran-fields').forEach(section=>{const active=section.dataset.jenis===id;section.classList.toggle('hidden',!active);section.querySelectorAll('[data-dynamic-input], [data-keterangan-input], [data-lampiran-input]').forEach(input=>input.disabled=!active);});}
     typeSelect.addEventListener('change',updateGuide); updateGuide();
 </script>
 @endpush

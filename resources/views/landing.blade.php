@@ -514,7 +514,7 @@
         </div>
         <div class="hero-stats reveal reveal-delay-4">
             <div class="stat-item">
-                <span class="stat-num">{{ $produk->count() }}+</span>
+                <span class="stat-num">{{ $produkCount }}+</span>
                 <span class="stat-label">Produk Aktif</span>
             </div>
             <div class="stat-item">
@@ -696,7 +696,7 @@
         </a>
         @endforeach
     </div>
-    @if($produk->count() > 8)
+    @if($produkCount > 8)
     <div style="text-align:center; margin-top:40px;">
         <a href="{{ route('produk.allindex') }}" class="btn-grad">Lihat Semua Produk &rarr;</a>
     </div>

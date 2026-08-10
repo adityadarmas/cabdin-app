@@ -27,6 +27,14 @@
                 Jenis Pengajuan
             </a>
         </li>
+
+        <li>
+            <a href="{{ route('pengumuman.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('pengumuman.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Pengumuman
+            </a>
+        </li>
         <!-- Dashboard berita-->
         <li>
             <a href="{{ route('berita.index') }}"

@@ -11,9 +11,30 @@ class OperatorPengajuanController extends Controller
 {
     public function index()
     {
-        $pengajuans = Pengajuan::with('jenisPengajuan')->where('user_id', auth()->id())->latest()->paginate(10);
         $jenisPengajuans = $this->activeTypes();
-        return view('operator.pengajuan.index', compact('pengajuans', 'jenisPengajuans'));
+        $notifikasi = auth()->user()->unreadNotifications()->latest()->limit(5)->get();
+
+        return view('operator.pengajuan.index', compact('jenisPengajuans', 'notifikasi'));
+    }
+
+    public function jenis(JenisPengajuan $jenisPengajuan)
+    {
+        abort_unless($jenisPengajuan->is_active, 404);
+
+        $pengajuans = Pengajuan::where('user_id', auth()->id())
+            ->where('jenis_pengajuan_id', $jenisPengajuan->id)
+            ->latest('submitted_at')
+            ->paginate(10);
+
+        return view('operator.pengajuan.jenis', compact('jenisPengajuan', 'pengajuans'));
+    }
+
+    public function show(Pengajuan $pengajuan)
+    {
+        $this->authorizeOwner($pengajuan);
+        $pengajuan->load('jenisPengajuan');
+
+        return view('operator.pengajuan.show', compact('pengajuan'));
     }
 
     public function create(Request $request)
@@ -24,14 +45,15 @@ class OperatorPengajuanController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validateData($request);
+        $jenis = $this->selectedJenis($request);
+        $data = $this->validateData($request, $jenis);
         $data['user_id'] = auth()->id();
         $data['status'] = 'menunggu';
         $data['submitted_at'] = now();
-        $data['lampiran'] = $this->storeAttachment($request);
+        $data['lampiran'] = $jenis->is_lampiran_enabled ? $this->storeAttachment($request) : null;
         Pengajuan::create($data);
 
-        return redirect()->route('operator.pengajuan.index')->with('success', 'Pengajuan berhasil dikirim untuk ditinjau admin.');
+        return redirect()->route('operator.pengajuan.jenis', $data['jenis_pengajuan_id'])->with('success', 'Pengajuan berhasil dikirim untuk ditinjau admin.');
     }
 
     public function edit(Pengajuan $pengajuan)
@@ -45,8 +67,9 @@ class OperatorPengajuanController extends Controller
     {
         $this->authorizeOwner($pengajuan);
         abort_unless(in_array($pengajuan->status, ['menunggu', 'ditolak']), 403);
-        $data = $this->validateData($request);
-        if ($request->hasFile('lampiran')) {
+        $jenis = $this->selectedJenis($request);
+        $data = $this->validateData($request, $jenis);
+        if ($jenis->is_lampiran_enabled && $request->hasFile('lampiran')) {
             if ($pengajuan->lampiran) {
                 Storage::disk('public')->delete($pengajuan->lampiran);
             }
@@ -57,7 +80,7 @@ class OperatorPengajuanController extends Controller
         $data['keterangan_admin'] = null;
         $pengajuan->update($data);
 
-        return redirect()->route('operator.pengajuan.index')->with('success', 'Pengajuan diperbarui dan dikirim ulang ke admin.');
+        return redirect()->route('operator.pengajuan.jenis', $data['jenis_pengajuan_id'])->with('success', 'Pengajuan diperbarui dan dikirim ulang ke admin.');
     }
 
     public function destroy(Pengajuan $pengajuan)
@@ -70,16 +93,17 @@ class OperatorPengajuanController extends Controller
         return back()->with('success', 'Pengajuan berhasil dihapus.');
     }
 
-    private function validateData(Request $request): array
+    private function validateData(Request $request, JenisPengajuan $jenis): array
     {
         $rules = [
             'jenis_pengajuan_id' => 'required|exists:jenis_pengajuans,id',
-            'isi' => 'required|string',
-            'lampiran' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
             'data_tambahan' => 'nullable|array',
         ];
 
-        $jenis = JenisPengajuan::where('is_active', true)->findOrFail($request->integer('jenis_pengajuan_id'));
+        $rules['isi'] = $jenis->is_keterangan_enabled ? 'required|string' : 'nullable|string';
+        if ($jenis->is_lampiran_enabled) {
+            $rules['lampiran'] = 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120';
+        }
         $rules['judul'] = 'nullable';
         foreach ($jenis->form_fields ?? [] as $field) {
             $rule = [$field['required'] ? 'required' : 'nullable'];
@@ -90,7 +114,14 @@ class OperatorPengajuanController extends Controller
 
         $data = $request->validate($rules);
         $data['judul'] = $jenis->nama;
+        $data['isi'] = $data['isi'] ?? '';
         return $data;
+    }
+
+    private function selectedJenis(Request $request): JenisPengajuan
+    {
+        return JenisPengajuan::where('is_active', true)
+            ->findOrFail($request->integer('jenis_pengajuan_id'));
     }
 
     private function storeAttachment(Request $request): ?string

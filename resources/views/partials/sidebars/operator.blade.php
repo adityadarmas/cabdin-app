@@ -3,6 +3,14 @@
     <ul class="space-y-2">
 
         <li>
+            <a href="{{ route('operator.dashboard') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('operator.dashboard') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Dashboard
+            </a>
+        </li>
+
+        <li>
             <a href="{{ route('operator.produk.index') }}"
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('operator.produk.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
@@ -15,6 +23,14 @@
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('operator.pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
                 Pengajuan Saya
+            </a>
+        </li>
+
+        <li>
+            <a href="{{ route('operator.notifikasi.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('operator.notifikasi.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Notifikasi
             </a>
         </li>
 

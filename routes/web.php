@@ -18,6 +18,9 @@ use App\Http\Controllers\SuratKeluarController;
 use App\Http\Controllers\OperatorPengajuanController;
 use App\Http\Controllers\AdminPengajuanController;
 use App\Http\Controllers\JenisPengajuanController;
+use App\Http\Controllers\OperatorNotificationController;
+use App\Http\Controllers\OperatorDashboardController;
+use App\Http\Controllers\PengumumanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,6 +79,9 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::middleware('role:operator')->prefix('operator')->group(function () {
+        Route::get('/', [OperatorDashboardController::class, 'index'])->name('operator.dashboard');
+        Route::get('/notifikasi/data', [OperatorNotificationController::class, 'feed'])->name('operator.notifikasi.feed');
+        Route::get('/notifikasi', [OperatorNotificationController::class, 'index'])->name('operator.notifikasi.index');
         Route::get('/akun', [OperatorAkunController::class, 'edit'])->name('operator.akun.edit');
         Route::put('/akun', [OperatorAkunController::class, 'update'])->name('operator.akun.update');
 
@@ -85,9 +91,13 @@ Route::middleware('auth')->group(function () {
         Route::put('/produk/{produk}', [ProdukController::class, 'operatorUpdate'])->name('operator.produk.update');
         Route::delete('/produk/{produk}', [ProdukController::class, 'operatorDestroy'])->name('operator.produk.destroy');
 
+        Route::get('/pengajuan/jenis/{jenisPengajuan}', [OperatorPengajuanController::class, 'jenis'])
+            ->name('operator.pengajuan.jenis');
         Route::resource('pengajuan', OperatorPengajuanController::class)
             ->except(['show'])
             ->names('operator.pengajuan');
+        Route::get('/pengajuan/{pengajuan}', [OperatorPengajuanController::class, 'show'])
+            ->name('operator.pengajuan.show');
     });
 
     Route::resource('surat-masuk', SuratMasukController::class);
@@ -120,14 +130,21 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->prefix('admin')->group(function () {
 
         Route::get('/pengajuan', [AdminPengajuanController::class, 'index'])->name('admin.pengajuan.index');
+        Route::get('/pengajuan/jenis/{jenisPengajuan}', [AdminPengajuanController::class, 'jenis'])->name('admin.pengajuan.jenis');
         Route::get('/pengajuan/export', [AdminPengajuanController::class, 'export'])->name('admin.pengajuan.export');
+        Route::get('/pengajuan/{pengajuan}', [AdminPengajuanController::class, 'show'])->name('admin.pengajuan.show');
         Route::put('/pengajuan/{pengajuan}', [AdminPengajuanController::class, 'update'])->name('admin.pengajuan.update');
         Route::resource('jenis-pengajuan', JenisPengajuanController::class)->except(['show']);
+        Route::resource('pengumuman', PengumumanController::class)->except(['show']);
 
         Route::get('/register', [RegisterController::class, 'showRegister'])->name('admin.register');
         Route::post('/register', [RegisterController::class, 'register']);
 
+        // Halaman detail publik memakai nama berita.show. Admin tidak memiliki
+        // tampilan show tersendiri, sehingga route tersebut dikecualikan agar
+        // route cache dapat dibuat tanpa konflik nama.
         Route::resource('berita', BeritaController::class)
+            ->except(['show'])
             ->parameters(['berita' => 'berita']);
 
         Route::resource('users', UserAccessController::class)
@@ -142,7 +159,9 @@ Route::middleware('auth')->group(function () {
         Route::put('/users/{user}/update-password', [UserAccessController::class, 'updatePassword'])
             ->name('admin.users.updatePassword');
 
-        Route::resource('prosedur', ProsedurController::class);
+        // Detail prosedur tersedia pada halaman publik; panel admin tidak
+        // membutuhkan route show terpisah.
+        Route::resource('prosedur', ProsedurController::class)->except(['show']);
 
         Route::resource('kategori-prosedur', KategoriProsedurController::class)
             ->parameters(['kategori-prosedur' => 'kategoriProsedur'])
