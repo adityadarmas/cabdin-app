@@ -17,14 +17,21 @@
             <a href="{{ route('admin.pengajuan.index') }}"
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('admin.pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Pengajuan Operator
+                Pengumpulan Data Operator
             </a>
         </li>
         <li>
             <a href="{{ route('jenis-pengajuan.index') }}"
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('jenis-pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Jenis Pengajuan
+                Jenis Pengumpulan Data
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('kategori-pengajuan.index') }}"
+               class="block px-4 py-2 pl-7 rounded-lg transition text-sm
+                      {{ request()->routeIs('kategori-pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                ↳ Kategori Pengumpulan Data
             </a>
         </li>
 
@@ -40,7 +47,14 @@
             <a href="{{ route('berita.index') }}"
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('berita.index') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Dashboard Berita
+                Manajemen Informasi
+            </a>
+        </li>
+        <li>
+            <a href="{{ route('kategori-informasi.index') }}"
+               class="block px-4 py-2 pl-7 rounded-lg transition text-sm
+                      {{ request()->routeIs('kategori-informasi.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                ↳ Kategori Informasi
             </a>
         </li>
         <!-- Manajemen Prosedur -->

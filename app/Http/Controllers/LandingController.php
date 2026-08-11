@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DapodikJadwal;
 use App\Models\KategoriProsedur;
 use App\Models\Berita;
+use App\Models\KategoriInformasi;
 use App\Models\Produk;
 
 class LandingController extends Controller
@@ -27,7 +28,12 @@ class LandingController extends Controller
                                     ->orderBy('urutan')
                                     ->with(['prosedursAktif'])
                                     ->get(),
-            'berita'           => Berita::where('is_active', 1)->latest()->limit(6)->get(),
+            'berita'           => Berita::with('kategoriInformasi')->where('is_active', 1)->latest()->limit(6)->get(),
+            'kategoriInformasi' => KategoriInformasi::where('is_active', true)
+                                    ->whereNull('parent_id')
+                                    ->with(['children' => fn ($query) => $query->where('is_active', true)->orderBy('urutan')])
+                                    ->orderBy('urutan')
+                                    ->get(),
             // Landing page hanya menampilkan maksimal delapan produk. Ambil satu
             // data tambahan untuk menentukan apakah tombol "Lihat Semua" perlu
             // ditampilkan, bukan seluruh isi tabel produk.

@@ -490,7 +490,22 @@
         @else
         <a href="#prosedur">Prosedur</a>
         @endif
-        <a href="#berita">Berita</a>
+        @if($kategoriInformasi->isNotEmpty())
+        <div class="nav-dropdown">
+            <a href="#informasi" class="nav-dropdown-toggle" aria-haspopup="true">Informasi <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></a>
+            <div class="nav-dropdown-menu" role="menu" aria-label="Kategori informasi">
+                <a href="#informasi" role="menuitem">Semua Informasi</a>
+                @foreach($kategoriInformasi as $kategori)
+                    <a href="{{ route('berita.all', ['kategori' => $kategori->id]) }}" role="menuitem"><span class="nav-dropdown-dot"></span><strong>{{ $kategori->nama }}</strong></a>
+                    @foreach($kategori->children as $subKategori)
+                        <a href="{{ route('berita.all', ['kategori' => $subKategori->id]) }}" role="menuitem" style="padding-left:32px; font-size:12px;"><span class="nav-dropdown-dot"></span>↳ {{ $subKategori->nama }}</a>
+                    @endforeach
+                @endforeach
+            </div>
+        </div>
+        @else
+        <a href="#informasi">Informasi</a>
+        @endif
         <a href="#staff">Staff</a>
     </div>
     <a href="{{ route('login') }}" class="nav-cta">Masuk</a>
@@ -519,7 +534,7 @@
             </div>
             <div class="stat-item">
                 <span class="stat-num">{{ $berita->count() }}+</span>
-                <span class="stat-label">Berita Terkini</span>
+                <span class="stat-label">Informasi Terkini</span>
             </div>
             <div class="stat-item">
                 <span class="stat-num">{{ $kategoriProsedur->sum(fn($k) => $k->prosedursAktif->count()) }}</span>
@@ -792,9 +807,9 @@
 </section>
 
 <!-- BERITA -->
-<section class="section section-alt" id="berita">
+<section class="section section-alt" id="informasi">
     <div class="section-header">
-        <span class="section-eyebrow reveal">Berita</span>
+        <span class="section-eyebrow reveal">Informasi</span>
         <h2 class="section-title reveal reveal-delay-1">Informasi &amp;<br/>Pengumuman Terkini</h2>
         <p class="section-desc reveal reveal-delay-2">Ikuti perkembangan terbaru kegiatan, agenda, dan pengumuman resmi dari Cabang Dinas Pendidikan.</p>
     </div>
@@ -812,7 +827,7 @@
                 @endif
             </div>
             <div class="berita-featured-body">
-                <span class="berita-cat">Utama</span>
+                <span class="berita-cat">{{ $featured->kategoriInformasi?->nama ?? 'Informasi Utama' }}</span>
                 <h3 class="berita-featured-title">{{ $featured->judul }}</h3>
                 <p class="berita-featured-desc">{{ Str::limit(strip_tags($featured->konten), 180) }}</p>
                 <div class="berita-meta">
@@ -829,14 +844,14 @@
                 <div class="berita-item-num">0{{ $loop->iteration }}</div>
                 <div class="berita-item-content">
                     <div class="berita-item-title">{{ $item->judul }}</div>
-                    <div class="berita-item-date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d M Y') }}</div>
+                    <div class="berita-item-date">{{ $item->kategoriInformasi?->nama ? $item->kategoriInformasi->nama.' · ' : '' }}{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d M Y') }}</div>
                 </div>
             </a>
             @endforeach
         </div>
     </div>
     @else
-    <p style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada berita yang tersedia.</p>
+    <p style="text-align:center; color:var(--text-muted); padding:40px 0;">Belum ada informasi yang tersedia.</p>
     @endif
 </section>
 
@@ -1022,7 +1037,7 @@
                 <a href="#hero">Beranda</a>
                 <a href="#produk">Produk Sekolah</a>
                 <a href="#prosedur">Prosedur</a>
-                <a href="#berita">Berita</a>
+                <a href="#informasi">Informasi</a>
                 <a href="#staff">Organisasi</a>
             </div>
         </div>

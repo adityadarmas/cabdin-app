@@ -54,13 +54,13 @@ class AdminPengajuanController extends Controller
         if ($pengajuan->wasChanged(['status', 'keterangan_admin']) && $pengajuan->operator) {
             $status = ucfirst($pengajuan->status);
             $message = $pengajuan->wasChanged('status')
-                ? "Status pengajuan {$pengajuan->jenisPengajuan?->nama} telah diubah menjadi {$status}."
-                : "Keterangan admin untuk pengajuan {$pengajuan->jenisPengajuan?->nama} telah diperbarui.";
+                ? "Status pengumpulan data {$pengajuan->jenisPengajuan?->nama} telah diubah menjadi {$status}."
+                : "Keterangan admin untuk pengumpulan data {$pengajuan->jenisPengajuan?->nama} telah diperbarui.";
 
             $pengajuan->operator->notify(new PengajuanStatusChanged($pengajuan, $message));
         }
 
-        return back()->with('success', 'Status pengajuan berhasil diperbarui.');
+        return back()->with('success', 'Status pengumpulan data berhasil diperbarui.');
     }
 
     public function export(Request $request)
@@ -69,12 +69,12 @@ class AdminPengajuanController extends Controller
         if ($request->filled('status')) $query->where('status', $request->status);
         if ($request->filled('jenis_pengajuan_id')) $query->where('jenis_pengajuan_id', $request->integer('jenis_pengajuan_id'));
 
-        $filename = 'pengajuan-operator-'.now()->format('Ymd-His').'.csv';
+        $filename = 'pengumpulan-data-operator-'.now()->format('Ymd-His').'.csv';
 
         return response()->streamDownload(function () use ($query) {
             $output = fopen('php://output', 'w');
             fwrite($output, "\xEF\xBB\xBF");
-            fputcsv($output, ['No', 'Jenis Pengajuan', 'Operator', 'Sekolah', 'Keterangan', 'Status', 'Keterangan Admin', 'Tanggal Pengajuan', 'Lampiran']);
+            fputcsv($output, ['No', 'Jenis Pengumpulan Data', 'Operator', 'Sekolah', 'Keterangan', 'Status', 'Keterangan Admin', 'Tanggal Pengumpulan Data', 'Lampiran']);
             $number = 1;
 
             foreach ($query->cursor() as $item) {

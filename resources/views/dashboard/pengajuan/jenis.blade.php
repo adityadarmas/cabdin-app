@@ -12,12 +12,12 @@
     @endphp
 
     <div class="max-w-6xl mx-auto">
-        <a href="{{ route('admin.pengajuan.index') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600">← Semua jenis pengajuan</a>
+        <a href="{{ route('admin.pengajuan.index') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600">← Semua jenis pengumpulan data</a>
         <div class="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white shadow-lg">
-            <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Antrian Pengajuan</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Antrian Pengumpulan Data</p>
             <h1 class="mt-2 text-2xl font-extrabold">{{ $jenisPengajuan->nama }}</h1>
             @if ($jenisPengajuan->deskripsi)
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-100">{{ $jenisPengajuan->deskripsi }}</p>
+                <div class="mt-2 max-w-3xl text-sm leading-6 text-blue-100 [&_a]:font-bold [&_a]:underline [&_ol]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:ml-5 [&_ul]:list-disc">{!! $jenisPengajuan->deskripsi !!}</div>
             @endif
         </div>
 
@@ -39,8 +39,8 @@
 
         <section class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
-                <h2 class="font-extrabold text-slate-800">Daftar Pengajuan</h2>
-                <span class="text-xs font-semibold text-slate-500">{{ $pengajuans->total() }} pengajuan</span>
+                <h2 class="font-extrabold text-slate-800">Daftar Pengumpulan Data</h2>
+                <span class="text-xs font-semibold text-slate-500">{{ $pengajuans->total() }} data</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @forelse ($pengajuans as $item)
@@ -56,13 +56,13 @@
                                 @if ($item->lampiran)
                                     <a class="mt-3 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50" target="_blank" href="{{ asset('storage/'.$item->lampiran) }}">Buka lampiran</a>
                                 @endif
-                                <a href="{{ route('admin.pengajuan.show', $item) }}" class="mt-3 inline-flex rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100">Lihat detail pengajuan</a>
+                                <a href="{{ route('admin.pengajuan.show', $item) }}" class="mt-3 inline-flex rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100">Lihat detail data</a>
                             </div>
 
                             <form class="w-full rounded-xl bg-slate-50 p-4 lg:w-80" method="POST" action="{{ route('admin.pengajuan.update', $item) }}">
                                 @csrf
                                 @method('PUT')
-                                <label class="mb-1 block text-xs font-bold text-slate-600">Status Pengajuan</label>
+                                <label class="mb-1 block text-xs font-bold text-slate-600">Status Pengumpulan Data</label>
                                 <select class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm" name="status">
                                     @foreach ($statusLabel as $value => $label)
                                         <option value="{{ $value }}" @selected($item->status === $value)>{{ $label }}</option>
@@ -75,7 +75,7 @@
                         </div>
                     </article>
                 @empty
-                    <div class="p-12 text-center text-sm text-slate-400">Belum ada pengajuan untuk jenis ini.</div>
+                    <div class="p-12 text-center text-sm text-slate-400">Belum ada data untuk jenis ini.</div>
                 @endforelse
             </div>
             @if ($pengajuans->hasPages())

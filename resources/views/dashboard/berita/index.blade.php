@@ -4,10 +4,10 @@
     <div class="p-6">
 
         <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-semibold">Manajemen Berita</h1>
+            <h1 class="text-2xl font-semibold">Manajemen Informasi</h1>
 
             <a href="{{ route('berita.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-                + Tambah Berita
+                + Tambah Informasi
             </a>
         </div>
         @if (session('success'))
@@ -22,6 +22,7 @@
                     <tr>
                         <th class="px-4 py-2 text-center">No</th>
                         <th class="px-4 py-2 text-left">Judul</th>
+                        <th class="px-4 py-2 text-left">Kategori</th>
                         <th class="px-4 py-2 text-left">Tanggal</th>
                         <th class="px-4 py-2 text-left">Thumbnail</th>
                         <th class="px-4 py-2 text-left">Aksi</th>
@@ -32,6 +33,7 @@
                         <tr class="border-t">
                             <td class="px-4 py-2 text-center">{{ $loop->iteration }}</td>
                             <td>{{ $item->judul }}</td>
+                            <td>{{ $item->kategoriInformasi?->nama ?? '-' }}</td>
                             <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
                             <td>
                                 @if ($item->thumbnail)
@@ -57,7 +59,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="text-center">
+                            <td colspan="6" class="text-center">
                                 Data belum tersedia
                             </td>
                         </tr>

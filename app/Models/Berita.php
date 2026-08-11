@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Berita extends Model
 {
     protected $fillable = [
+        'kategori_informasi_id',
         'judul',
         'konten',
         'tanggal',
@@ -17,4 +18,9 @@ class Berita extends Model
     protected $casts = [
         'tanggal' => 'date',
     ];
+
+    public function kategoriInformasi()
+    {
+        return $this->belongsTo(KategoriInformasi::class);
+    }
 }

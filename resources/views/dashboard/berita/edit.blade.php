@@ -124,6 +124,14 @@
                 @enderror
             </div>
 
+            <div class="mb-4">
+                <label class="field-label">Kategori Informasi</label>
+                <select name="kategori_informasi_id" class="form-input">
+                    <option value="">Tanpa kategori</option>
+                    @foreach($kategoriInformasis as $kategori)<option value="{{ $kategori->id }}" @selected(old('kategori_informasi_id', $berita->kategori_informasi_id) == $kategori->id)>{{ $kategori->parent_id ? '— ' : '' }}{{ $kategori->nama }}</option>@endforeach
+                </select>
+            </div>
+
             <div class="flex gap-4 flex-wrap">
                 <div class="flex-1" style="min-width:180px;">
                     <label class="field-label">Tanggal Publikasi <span class="text-red-500">*</span></label>

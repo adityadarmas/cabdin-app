@@ -19,7 +19,7 @@
         <div class="grid gap-6 lg:grid-cols-[1fr_320px]">
             <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
                 <div class="bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white">
-                    <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Detail Pengajuan</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Detail Pengumpulan Data</p>
                     <div class="mt-2 flex flex-wrap items-start justify-between gap-3">
                         <div>
                             <h1 class="text-2xl font-extrabold">{{ $jenis?->nama ?? $pengajuan->judul }}</h1>
@@ -39,12 +39,12 @@
                     </div>
 
                     @if (filled($pengajuan->isi))
-                        <div class="border-t border-slate-100 pt-6"><h2 class="text-sm font-extrabold text-slate-700">Keterangan Pengajuan</h2><p class="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{{ $pengajuan->isi }}</p></div>
+                        <div class="border-t border-slate-100 pt-6"><h2 class="text-sm font-extrabold text-slate-700">Keterangan Pengumpulan Data</h2><p class="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{{ $pengajuan->isi }}</p></div>
                     @endif
 
                     @if (!empty($pengajuan->data_tambahan))
                         <div class="border-t border-slate-100 pt-6">
-                            <h2 class="text-sm font-extrabold text-slate-700">Data Form Pengajuan</h2>
+                            <h2 class="text-sm font-extrabold text-slate-700">Data Form Terkumpul</h2>
                             <dl class="mt-4 grid gap-4 sm:grid-cols-2">
                                 @foreach ($pengajuan->data_tambahan as $key => $value)
                                     <div class="rounded-xl bg-slate-50 p-4"><dt class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ data_get($fieldLabels->get($key), 'label', str_replace('_', ' ', $key)) }}</dt><dd class="mt-1 whitespace-pre-line text-sm font-semibold text-slate-700">{{ is_array($value) ? implode(', ', $value) : $value }}</dd></div>
@@ -64,7 +64,7 @@
                 <form class="mt-4" method="POST" action="{{ route('admin.pengajuan.update', $pengajuan) }}">
                     @csrf
                     @method('PUT')
-                    <label class="mb-1 block text-xs font-bold text-slate-600">Status Pengajuan</label>
+                    <label class="mb-1 block text-xs font-bold text-slate-600">Status Pengumpulan Data</label>
                     <select class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm" name="status">
                         @foreach ($statusLabel as $value => $label)
                             <option value="{{ $value }}" @selected($pengajuan->status === $value)>{{ $label }}</option>

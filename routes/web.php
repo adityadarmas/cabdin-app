@@ -20,7 +20,10 @@ use App\Http\Controllers\AdminPengajuanController;
 use App\Http\Controllers\JenisPengajuanController;
 use App\Http\Controllers\OperatorNotificationController;
 use App\Http\Controllers\OperatorDashboardController;
+use App\Http\Controllers\OperatorTagihanController;
 use App\Http\Controllers\PengumumanController;
+use App\Http\Controllers\KategoriPengajuanController;
+use App\Http\Controllers\KategoriInformasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +85,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/', [OperatorDashboardController::class, 'index'])->name('operator.dashboard');
         Route::get('/notifikasi/data', [OperatorNotificationController::class, 'feed'])->name('operator.notifikasi.feed');
         Route::get('/notifikasi', [OperatorNotificationController::class, 'index'])->name('operator.notifikasi.index');
+        Route::get('/tagihan', [OperatorTagihanController::class, 'index'])->name('operator.tagihan.index');
         Route::get('/akun', [OperatorAkunController::class, 'edit'])->name('operator.akun.edit');
         Route::put('/akun', [OperatorAkunController::class, 'update'])->name('operator.akun.update');
 
@@ -135,6 +139,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengajuan/{pengajuan}', [AdminPengajuanController::class, 'show'])->name('admin.pengajuan.show');
         Route::put('/pengajuan/{pengajuan}', [AdminPengajuanController::class, 'update'])->name('admin.pengajuan.update');
         Route::resource('jenis-pengajuan', JenisPengajuanController::class)->except(['show']);
+        Route::resource('kategori-pengajuan', KategoriPengajuanController::class)->only(['index', 'store', 'update', 'destroy']);
+        Route::resource('kategori-informasi', KategoriInformasiController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('pengumuman', PengumumanController::class)->except(['show']);
 
         Route::get('/register', [RegisterController::class, 'showRegister'])->name('admin.register');

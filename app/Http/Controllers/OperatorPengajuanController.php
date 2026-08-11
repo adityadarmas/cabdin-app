@@ -12,7 +12,9 @@ class OperatorPengajuanController extends Controller
     public function index()
     {
         $jenisPengajuans = $this->activeTypes();
-        $notifikasi = auth()->user()->unreadNotifications()->latest()->limit(5)->get();
+        $user = auth()->user();
+        $notifikasi = $user->unreadNotifications()->latest()->limit(5)->get();
+        $user->unreadNotifications()->update(['read_at' => now()]);
 
         return view('operator.pengajuan.index', compact('jenisPengajuans', 'notifikasi'));
     }
@@ -53,7 +55,7 @@ class OperatorPengajuanController extends Controller
         $data['lampiran'] = $jenis->is_lampiran_enabled ? $this->storeAttachment($request) : null;
         Pengajuan::create($data);
 
-        return redirect()->route('operator.pengajuan.jenis', $data['jenis_pengajuan_id'])->with('success', 'Pengajuan berhasil dikirim untuk ditinjau admin.');
+        return redirect()->route('operator.pengajuan.jenis', $data['jenis_pengajuan_id'])->with('success', 'Pengumpulan data berhasil dikirim untuk ditinjau admin.');
     }
 
     public function edit(Pengajuan $pengajuan)
@@ -80,7 +82,7 @@ class OperatorPengajuanController extends Controller
         $data['keterangan_admin'] = null;
         $pengajuan->update($data);
 
-        return redirect()->route('operator.pengajuan.jenis', $data['jenis_pengajuan_id'])->with('success', 'Pengajuan diperbarui dan dikirim ulang ke admin.');
+        return redirect()->route('operator.pengajuan.jenis', $data['jenis_pengajuan_id'])->with('success', 'Pengumpulan data diperbarui dan dikirim ulang ke admin.');
     }
 
     public function destroy(Pengajuan $pengajuan)
@@ -90,7 +92,7 @@ class OperatorPengajuanController extends Controller
             Storage::disk('public')->delete($pengajuan->lampiran);
         }
         $pengajuan->delete();
-        return back()->with('success', 'Pengajuan berhasil dihapus.');
+        return back()->with('success', 'Pengumpulan data berhasil dihapus.');
     }
 
     private function validateData(Request $request, JenisPengajuan $jenis): array
@@ -136,6 +138,12 @@ class OperatorPengajuanController extends Controller
 
     private function activeTypes()
     {
-        return JenisPengajuan::where('is_active', true)->orderBy('urutan')->get();
+        return JenisPengajuan::with('kategoriPengajuan')
+            ->where('is_active', true)
+            ->whereHas('kategoriPengajuan', fn ($query) => $query->where('is_active', true))
+            ->orderBy('urutan')
+            ->get()
+            ->sortBy(fn (JenisPengajuan $jenis) => (($jenis->kategoriPengajuan?->urutan ?? 9999) * 10000) + $jenis->urutan)
+            ->values();
     }
 }

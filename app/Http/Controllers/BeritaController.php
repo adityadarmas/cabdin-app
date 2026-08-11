@@ -3,20 +3,33 @@
 namespace App\Http\Controllers;
 
 use App\Models\Berita;
+use App\Models\KategoriInformasi;
+use App\Models\User;
+use App\Notifications\BeritaPublished;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class BeritaController extends Controller
 {
     public function index()
     {
-        $data = Berita::latest()->get();
+        $data = Berita::with('kategoriInformasi')->latest()->get();
         return view('dashboard.berita.index', compact('data'));
     }
 
     public function publicIndex()
     {
-        $berita = Berita::where('is_active', 1)->latest()->paginate(9);
-        return view('berita.index', compact('berita'));
+        $query = Berita::with('kategoriInformasi')->where('is_active', 1)->latest();
+        if ($request->filled('kategori')) {
+            $kategori = KategoriInformasi::find($request->integer('kategori'));
+            if ($kategori) {
+                $categoryIds = [$kategori->id, ...$kategori->children()->pluck('id')->all()];
+                $query->whereIn('kategori_informasi_id', $categoryIds);
+            }
+        }
+        $berita = $query->paginate(9)->withQueryString();
+        $kategoriInformasis = KategoriInformasi::where('is_active', true)->orderBy('urutan')->get();
+        return view('berita.index', compact('berita', 'kategoriInformasis'));
     }
 
     public function show(Berita $berita)
@@ -32,12 +45,13 @@ class BeritaController extends Controller
 
     public function create()
     {
-        return view('dashboard.berita.create');
+        return view('dashboard.berita.create', ['kategoriInformasis' => $this->categories()]);
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'kategori_informasi_id' => 'nullable|exists:kategori_informasi,id',
             'judul'     => 'required|string|max:255',
             'konten'    => 'required',
             'tanggal'   => 'required|date',
@@ -50,7 +64,14 @@ class BeritaController extends Controller
             $validated['thumbnail'] = $thumbnailPath;
         }
 
-        Berita::create($validated);
+        $berita = Berita::create($validated)->refresh();
+
+        if ($berita->is_active) {
+            Notification::send(
+                User::where('role', 'operator')->get(),
+                new BeritaPublished($berita)
+            );
+        }
 
         return redirect()
             ->route('berita.index')
@@ -59,12 +80,13 @@ class BeritaController extends Controller
 
     public function edit(Berita $berita)
     {
-        return view('dashboard.berita.edit', compact('berita'));
+        return view('dashboard.berita.edit', ['berita' => $berita, 'kategoriInformasis' => $this->categories()]);
     }
 
     public function update(Request $request, Berita $berita)
     {
         $validated = $request->validate([
+            'kategori_informasi_id' => 'nullable|exists:kategori_informasi,id',
             'judul'   => 'required|string|max:255',
             'konten'  => 'required',
             'tanggal' => 'required|date',
@@ -84,5 +106,10 @@ class BeritaController extends Controller
         return redirect()
             ->route('berita.index')
             ->with('success', 'Berita berhasil dihapus');
+    }
+
+    private function categories()
+    {
+        return KategoriInformasi::where('is_active', true)->orderBy('urutan')->get();
     }
 }

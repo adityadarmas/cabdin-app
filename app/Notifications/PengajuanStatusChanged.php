@@ -24,7 +24,7 @@ class PengajuanStatusChanged extends Notification
     public function toDatabase(object $notifiable): array
     {
         return [
-            'title' => 'Pembaruan pengajuan',
+            'title' => 'Pembaruan pengumpulan data',
             'message' => $this->message,
             'pengajuan_id' => $this->pengajuan->id,
             'jenis_pengajuan' => $this->pengajuan->jenisPengajuan?->nama ?? $this->pengajuan->judul,

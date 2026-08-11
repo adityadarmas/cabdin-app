@@ -116,12 +116,20 @@
 
 <div class="hero-bar">
     <div class="hero-inner">
-        <div class="hero-eyebrow">Berita &amp; Informasi</div>
-        <h1 class="hero-title">Pengumuman &amp; Berita Terkini</h1>
+    <div class="hero-eyebrow">Informasi E-Cabdin</div>
+        <h1 class="hero-title">Informasi Terkini</h1>
     </div>
 </div>
 
 <div class="page-wrap">
+    @if($kategoriInformasis->isNotEmpty())
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px;">
+        <a href="{{ route('berita.all') }}" style="padding:8px 13px;border-radius:999px;font-size:12px;font-weight:700;{{ !request('kategori') ? 'background:var(--navy);color:white;' : 'background:white;border:1px solid var(--border);color:var(--text-muted);' }}">Semua Informasi</a>
+        @foreach($kategoriInformasis as $kategori)
+        <a href="{{ route('berita.all',['kategori'=>$kategori->id]) }}" style="padding:8px 13px;border-radius:999px;font-size:12px;font-weight:700;{{ (string)request('kategori')===(string)$kategori->id ? 'background:var(--navy);color:white;' : 'background:white;border:1px solid var(--border);color:var(--text-muted);' }}">{{ $kategori->parent_id ? '— ' : '' }}{{ $kategori->nama }}</a>
+        @endforeach
+    </div>
+    @endif
     @if($berita->count() > 0)
     <div class="berita-grid">
         @foreach($berita as $item)
@@ -136,7 +144,7 @@
                 @endif
             </div>
             <div class="berita-body">
-                <div class="berita-date">{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}</div>
+                <div class="berita-date">{{ $item->kategoriInformasi?->nama ? $item->kategoriInformasi->nama.' · ' : '' }}{{ \Carbon\Carbon::parse($item->tanggal)->translatedFormat('d F Y') }}</div>
                 <div class="berita-title">{{ $item->judul }}</div>
                 <div class="berita-excerpt">{{ Str::limit(strip_tags($item->konten), 120) }}</div>
                 <div class="berita-read">Baca selengkapnya &rarr;</div>
@@ -150,8 +158,8 @@
     @else
     <div class="empty">
         <div class="empty-icon">📰</div>
-        <p style="font-weight:600; font-size:16px; color:var(--navy); margin-bottom:6px;">Belum ada berita</p>
-        <p style="font-size:14px;">Belum ada berita yang dipublikasikan.</p>
+        <p style="font-weight:600; font-size:16px; color:var(--navy); margin-bottom:6px;">Belum ada informasi</p>
+        <p style="font-size:14px;">Belum ada informasi yang dipublikasikan.</p>
     </div>
     @endif
 </div>

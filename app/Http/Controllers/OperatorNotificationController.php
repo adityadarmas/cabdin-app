@@ -9,7 +9,7 @@ class OperatorNotificationController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $notifications = $user->notifications()->latest()->paginate(20);
+        $notifications = $user->unreadNotifications()->latest()->paginate(20);
         $user->unreadNotifications()->update(['read_at' => now()]);
 
         return view('operator.notifikasi.index', compact('notifications'));

@@ -13,13 +13,13 @@
     @endphp
 
     <div class="max-w-4xl mx-auto">
-        <a href="{{ $jenis ? route('operator.pengajuan.jenis', $jenis) : route('operator.pengajuan.index') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600">← Kembali ke riwayat pengajuan</a>
+        <a href="{{ $jenis ? route('operator.pengajuan.jenis', $jenis) : route('operator.pengajuan.index') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600">← Kembali ke riwayat pengumpulan data</a>
 
         <section class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white">
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                        <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Detail Pengajuan</p>
+                        <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Detail Pengumpulan Data</p>
                         <h1 class="mt-2 text-2xl font-extrabold">{{ $jenis?->nama ?? $pengajuan->judul }}</h1>
                         <p class="mt-2 text-sm text-blue-100">Dikirim {{ $pengajuan->submitted_at?->translatedFormat('d F Y, H:i') }}</p>
                     </div>
@@ -30,7 +30,7 @@
             <div class="space-y-6 p-6">
                 @if (filled($pengajuan->isi))
                     <div>
-                        <h2 class="text-sm font-extrabold text-slate-700">Keterangan Pengajuan</h2>
+                        <h2 class="text-sm font-extrabold text-slate-700">Keterangan Pengumpulan Data</h2>
                         <p class="mt-2 whitespace-pre-line text-sm leading-7 text-slate-600">{{ $pengajuan->isi }}</p>
                     </div>
                 @endif
@@ -65,8 +65,8 @@
 
                 @if (in_array($pengajuan->status, ['menunggu', 'ditolak']))
                     <div class="flex flex-wrap gap-3 border-t border-slate-100 pt-6">
-                        <a href="{{ route('operator.pengajuan.edit', $pengajuan) }}" class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700">Edit Pengajuan</a>
-                        <form method="POST" action="{{ route('operator.pengajuan.destroy', $pengajuan) }}" onsubmit="return confirm('Hapus pengajuan ini?')">
+                        <a href="{{ route('operator.pengajuan.edit', $pengajuan) }}" class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700">Edit Data</a>
+                        <form method="POST" action="{{ route('operator.pengajuan.destroy', $pengajuan) }}" onsubmit="return confirm('Hapus data ini?')">
                             @csrf
                             @method('DELETE')
                             <button class="rounded-lg border border-red-200 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50">Hapus</button>

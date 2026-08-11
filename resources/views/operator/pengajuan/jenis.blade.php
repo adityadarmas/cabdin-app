@@ -11,24 +11,24 @@
     @endphp
 
     <div class="max-w-5xl mx-auto">
-        <a href="{{ route('operator.pengajuan.index') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600">← Semua jenis pengajuan</a>
+        <a href="{{ route('operator.pengajuan.index') }}" class="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600">← Semua jenis pengumpulan data</a>
         <div class="rounded-2xl bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-white shadow-lg">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Jenis Pengajuan</p>
+                    <p class="text-xs font-bold uppercase tracking-widest text-blue-100">Jenis Pengumpulan Data</p>
                     <h1 class="mt-2 text-2xl font-extrabold">{{ $jenisPengajuan->nama }}</h1>
                     @if ($jenisPengajuan->deskripsi)
-                        <p class="mt-2 max-w-2xl text-sm leading-6 text-blue-100">{{ $jenisPengajuan->deskripsi }}</p>
+                        <div class="mt-2 max-w-2xl text-sm leading-6 text-blue-100 [&_a]:font-bold [&_a]:underline [&_ol]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:ml-5 [&_ul]:list-disc">{!! $jenisPengajuan->deskripsi !!}</div>
                     @endif
                 </div>
-                <a href="{{ route('operator.pengajuan.create', ['jenis' => $jenisPengajuan->id]) }}" class="shrink-0 rounded-xl bg-white px-4 py-3 text-sm font-extrabold text-blue-700 shadow-sm transition hover:bg-blue-50">+ Tambah Pengajuan Baru</a>
+                <a href="{{ route('operator.pengajuan.create', ['jenis' => $jenisPengajuan->id]) }}" class="shrink-0 rounded-xl bg-white px-4 py-3 text-sm font-extrabold text-blue-700 shadow-sm transition hover:bg-blue-50">+ Tambah Data Baru</a>
             </div>
         </div>
 
         <section class="mt-6 rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
-                <h2 class="font-extrabold text-slate-800">Riwayat Pengajuan</h2>
-                <span class="text-xs font-semibold text-slate-500">{{ $pengajuans->total() }} pengajuan</span>
+                <h2 class="font-extrabold text-slate-800">Riwayat Pengumpulan Data</h2>
+                <span class="text-xs font-semibold text-slate-500">{{ $pengajuans->total() }} data terkumpul</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @forelse ($pengajuans as $item)
@@ -49,8 +49,8 @@
                                 <a target="_blank" href="{{ asset('storage/'.$item->lampiran) }}" class="text-sm font-bold text-slate-500 hover:text-blue-600">Lihat lampiran</a>
                             @endif
                             @if (in_array($item->status, ['menunggu', 'ditolak']))
-                                <a href="{{ route('operator.pengajuan.edit', $item) }}" class="text-sm font-bold text-blue-600 hover:text-blue-800">Edit pengajuan</a>
-                                <form method="POST" action="{{ route('operator.pengajuan.destroy', $item) }}" onsubmit="return confirm('Hapus pengajuan ini?')">
+                                <a href="{{ route('operator.pengajuan.edit', $item) }}" class="text-sm font-bold text-blue-600 hover:text-blue-800">Edit data</a>
+                                <form method="POST" action="{{ route('operator.pengajuan.destroy', $item) }}" onsubmit="return confirm('Hapus data ini?')">
                                     @csrf
                                     @method('DELETE')
                                     <button class="text-sm font-bold text-red-600 hover:text-red-800">Hapus</button>
@@ -60,8 +60,8 @@
                     </article>
                 @empty
                     <div class="p-10 text-center">
-                        <p class="font-bold text-slate-600">Belum ada pengajuan.</p>
-                        <p class="mt-1 text-sm text-slate-500">Buat pengajuan pertama untuk jenis ini melalui tombol di atas.</p>
+                        <p class="font-bold text-slate-600">Belum ada data terkumpul.</p>
+                        <p class="mt-1 text-sm text-slate-500">Kumpulkan data pertama untuk jenis ini melalui tombol di atas.</p>
                     </div>
                 @endforelse
             </div>

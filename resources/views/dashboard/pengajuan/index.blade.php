@@ -3,8 +3,8 @@
 @section('content')
     <div class="max-w-6xl mx-auto">
         <div class="mb-6">
-            <h1 class="text-2xl font-extrabold text-slate-800">Pengajuan Operator</h1>
-            <p class="mt-1 text-sm text-slate-500">Pilih jenis pengajuan untuk meninjau antrian dan memperbarui statusnya.</p>
+            <h1 class="text-2xl font-extrabold text-slate-800">Pengumpulan Data Operator</h1>
+            <p class="mt-1 text-sm text-slate-500">Pilih jenis pengumpulan data untuk meninjau antrian dan memperbarui statusnya.</p>
         </div>
 
         <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -19,14 +19,14 @@
                         @endif
                     </div>
                     <h2 class="mt-4 text-base font-extrabold leading-6 text-slate-800">{{ $jenis->nama }}</h2>
-                    <p class="mt-2 min-h-10 text-xs leading-5 text-slate-500">{{ $jenis->deskripsi ?: 'Buka untuk meninjau pengajuan operator.' }}</p>
+                    <p class="mt-2 min-h-10 text-xs leading-5 text-slate-500">{{ $jenis->deskripsi ? \Illuminate\Support\Str::limit(strip_tags($jenis->deskripsi), 120) : 'Buka untuk meninjau data dari operator.' }}</p>
                     <div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">
-                        <span class="text-xs font-semibold text-slate-500">{{ $jenis->total_pengajuans_count }} total pengajuan</span>
+                        <span class="text-xs font-semibold text-slate-500">{{ $jenis->total_pengajuans_count }} total data</span>
                         <span class="text-xs font-bold text-blue-600">Buka antrian →</span>
                     </div>
                 </a>
             @empty
-                <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400 md:col-span-2 xl:col-span-3">Belum ada jenis pengajuan.</div>
+                <div class="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center text-sm text-slate-400 md:col-span-2 xl:col-span-3">Belum ada jenis pengumpulan data.</div>
             @endforelse
         </div>
     </div>
