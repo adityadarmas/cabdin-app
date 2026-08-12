@@ -22,6 +22,8 @@ class RegisterController extends Controller
             'email'        => 'required|email|unique:users,email',
             'role'         => 'required|in:admin,staff,tu,pimpinan,operator',
             'nama_sekolah' => 'required_if:role,operator|nullable|string|max:255',
+            'npsn'         => 'required_if:role,operator|nullable|digits:8|unique:users,npsn',
+            'status_sekolah' => 'required_if:role,operator|nullable|in:negeri,swasta',
             'no_wa'        => 'required_if:role,operator|nullable|string|max:20',
             'password'     => 'required|string|min:8|confirmed',
         ]);
@@ -29,6 +31,8 @@ class RegisterController extends Controller
         User::create([
             'name'         => $request->name,
             'nama_sekolah' => $request->role === 'operator' ? $request->nama_sekolah : null,
+            'npsn'         => $request->role === 'operator' ? $request->npsn : null,
+            'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
             'no_wa'        => $request->role === 'operator' ? $request->no_wa : null,
             'email'        => $request->email,
             'role'         => $request->role,

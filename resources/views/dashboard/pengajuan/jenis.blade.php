@@ -37,6 +37,20 @@
             <a href="{{ route('admin.pengajuan.export', ['jenis_pengajuan_id' => $jenisPengajuan->id, 'status' => request('status')]) }}" class="ml-auto rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-emerald-700">Export CSV</a>
         </div>
 
+        @if ($jenisPengajuan->is_tagihan_dashboard)
+            @php
+                $terkumpul = $rekapTagihan->where('pengumpulan_tagihan_count', '>', 0)->count();
+                $dibaca = $rekapTagihan->filter(fn ($operator) => $operator->pengumpulan_tagihan_count === 0 && $operator->tagihanKonfirmasis->isNotEmpty())->count();
+            @endphp
+            <section class="mt-5 overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm">
+                <div class="flex flex-col gap-3 border-b border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div><h2 class="font-extrabold text-emerald-900">Rekap Sekolah Tagihan</h2><p class="mt-1 text-xs text-emerald-700">{{ $terkumpul }} sudah mengumpulkan · {{ $dibaca }} sudah membaca · {{ $rekapTagihan->count() - $terkumpul - $dibaca }} belum ditindaklanjuti</p></div>
+                    <span class="text-xs font-bold text-emerald-700">Deadline {{ $jenisPengajuan->deadline_at?->translatedFormat('d M Y, H:i') }}</span>
+                </div>
+                <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-3">Sekolah</th><th class="px-5 py-3">Operator</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Waktu</th></tr></thead><tbody class="divide-y divide-slate-100">@forelse($rekapTagihan as $operator)<tr><td class="px-5 py-3 font-bold text-slate-700">{{ $operator->nama_sekolah ?: '-' }}</td><td class="px-5 py-3 text-slate-600">{{ $operator->name }}</td><td class="px-5 py-3">@if($operator->pengumpulan_tagihan_count > 0)<span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">Sudah mengumpulkan</span>@elseif($operator->tagihanKonfirmasis->isNotEmpty())<span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">Sudah dibaca</span>@else<span class="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700">Belum ditindaklanjuti</span>@endif</td><td class="px-5 py-3 text-xs text-slate-500">@if($operator->pengumpulan_tagihan_count > 0){{ $operator->pengajuans->first()?->submitted_at?->translatedFormat('d M Y, H:i') }}@elseif($operator->tagihanKonfirmasis->isNotEmpty()){{ $operator->tagihanKonfirmasis->first()->dibaca_at?->translatedFormat('d M Y, H:i') }}@else-@endif</td></tr>@empty<tr><td colspan="4" class="px-5 py-10 text-center text-slate-400">Belum ada operator sekolah.</td></tr>@endforelse</tbody></table></div>
+            </section>
+        @endif
+
         <section class="mt-5 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
             <div class="flex items-center justify-between border-b border-slate-100 px-5 py-4">
                 <h2 class="font-extrabold text-slate-800">Daftar Pengumpulan Data</h2>

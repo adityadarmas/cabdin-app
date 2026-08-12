@@ -21,6 +21,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'nama_sekolah',
+        'npsn',
+        'status_sekolah',
         'no_wa',
         'email',
         'role',
@@ -66,6 +68,11 @@ class User extends Authenticatable
     public function pengajuans()
     {
         return $this->hasMany(\App\Models\Pengajuan::class, 'user_id');
+    }
+
+    public function tagihanKonfirmasis()
+    {
+        return $this->hasMany(\App\Models\TagihanKonfirmasi::class, 'user_id');
     }
 
     // fungsi role per user

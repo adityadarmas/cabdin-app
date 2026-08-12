@@ -787,10 +787,10 @@
             @if($kat->prosedursAktif->isNotEmpty())
             <div class="prosedur-grid">
                 @foreach($kat->prosedursAktif as $i => $item)
-                <a href="{{ route('prosedur.category', $kat) }}" class="prosedur-card">
+                <a href="{{ route('prosedur.category', $kat) }}" class="prosedur-card" aria-label="Buka prosedur {{ $item->judul }}">
                     <div class="prosedur-num">{{ $i + 1 }}</div>
                     <div class="prosedur-title">{{ $item->judul }}</div>
-                    <div class="prosedur-desc">{{ $item->deskripsi }}</div>
+                    <div class="prosedur-desc">{{ \Illuminate\Support\Str::limit(trim(strip_tags($item->deskripsi)), 170) }}</div>
                     <div class="prosedur-link">Selengkapnya &rarr;</div>
                 </a>
                 @endforeach

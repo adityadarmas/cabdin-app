@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengajuan;
 use App\Models\JenisPengajuan;
+use App\Models\User;
 use App\Notifications\PengajuanStatusChanged;
 use Illuminate\Http\Request;
 
@@ -32,7 +33,18 @@ class AdminPengajuanController extends Controller
 
         $pengajuans = $query->paginate(15)->withQueryString();
 
-        return view('dashboard.pengajuan.jenis', compact('jenisPengajuan', 'pengajuans'));
+        $rekapTagihan = collect();
+        if ($jenisPengajuan->is_tagihan_dashboard) {
+            $rekapTagihan = User::where('role', 'operator')
+                ->with(['tagihanKonfirmasis' => fn ($query) => $query->where('jenis_pengajuan_id', $jenisPengajuan->id)])
+                ->with(['pengajuans' => fn ($query) => $query->where('jenis_pengajuan_id', $jenisPengajuan->id)->latest('submitted_at')])
+                ->withCount(['pengajuans as pengumpulan_tagihan_count' => fn ($query) => $query->where('jenis_pengajuan_id', $jenisPengajuan->id)])
+                ->orderBy('nama_sekolah')
+                ->orderBy('name')
+                ->get();
+        }
+
+        return view('dashboard.pengajuan.jenis', compact('jenisPengajuan', 'pengajuans', 'rekapTagihan'));
     }
 
     public function show(Pengajuan $pengajuan)

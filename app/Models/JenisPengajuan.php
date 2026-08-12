@@ -26,4 +26,9 @@ class JenisPengajuan extends Model
     {
         return $this->belongsTo(KategoriPengajuan::class);
     }
+
+    public function tagihanKonfirmasis()
+    {
+        return $this->hasMany(TagihanKonfirmasi::class);
+    }
 }

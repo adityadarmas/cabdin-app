@@ -100,6 +100,12 @@
                 @error('nama_sekolah')
                     <p class="text-sm text-red-500 mt-1">{{ $message }}</p>
                 @enderror
+                <label for="npsn" class="block pt-2 text-sm font-semibold text-slate-700">NPSN <span class="text-red-500">*</span></label>
+                <input type="text" id="npsn" name="npsn" value="{{ old('npsn') }}" inputmode="numeric" maxlength="8" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500" placeholder="8 digit NPSN">
+                @error('npsn')<p class="text-sm text-red-500 mt-1">{{ $message }}</p>@enderror
+                <label for="status_sekolah" class="block pt-2 text-sm font-semibold text-slate-700">Status Sekolah <span class="text-red-500">*</span></label>
+                <select id="status_sekolah" name="status_sekolah" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500"><option value="">Pilih status sekolah</option><option value="negeri" @selected(old('status_sekolah') === 'negeri')>Negeri</option><option value="swasta" @selected(old('status_sekolah') === 'swasta')>Swasta</option></select>
+                @error('status_sekolah')<p class="text-sm text-red-500 mt-1">{{ $message }}</p>@enderror
             </div>
 
             <!-- No WhatsApp (khusus operator) -->

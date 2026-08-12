@@ -22,7 +22,8 @@ class UserAccessController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
                       ->orWhere('email', 'like', "%{$search}%")
-                      ->orWhere('nama_sekolah', 'like', "%{$search}%");
+                      ->orWhere('nama_sekolah', 'like', "%{$search}%")
+                      ->orWhere('npsn', 'like', "%{$search}%");
                 });
             })
             ->orderBy('created_at', 'desc')
@@ -45,6 +46,8 @@ class UserAccessController extends Controller
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6|confirmed',
             'role'     => 'required|in:admin,staff,tu,pimpinan,operator',
+            'npsn'     => 'nullable|digits:8|unique:users,npsn',
+            'status_sekolah' => 'nullable|in:negeri,swasta',
         ], [
             'name.required'      => 'Nama wajib diisi.',
             'email.required'     => 'Email wajib diisi.',
@@ -60,6 +63,8 @@ class UserAccessController extends Controller
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => $request->role,
+            'npsn'     => $request->role === 'operator' ? $request->npsn : null,
+            'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
         ]);
 
         return redirect()->route('admin.users.index')
@@ -77,6 +82,8 @@ class UserAccessController extends Controller
             'email'        => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'role'         => 'required|in:admin,staff,tu,pimpinan,operator',
             'nama_sekolah' => 'nullable|string|max:255',
+            'npsn'         => ['nullable', 'digits:8', Rule::unique('users', 'npsn')->ignore($user->id)],
+            'status_sekolah' => 'nullable|in:negeri,swasta',
             'password'     => 'nullable|string|min:6|confirmed',
         ], [
             'name.required'      => 'Nama wajib diisi.',
@@ -92,6 +99,8 @@ class UserAccessController extends Controller
             'email'        => $request->email,
             'role'         => $request->role,
             'nama_sekolah' => $request->role === 'operator' ? $request->nama_sekolah : null,
+            'npsn'         => $request->role === 'operator' ? $request->npsn : null,
+            'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
         ];
 
         if ($request->filled('password')) {

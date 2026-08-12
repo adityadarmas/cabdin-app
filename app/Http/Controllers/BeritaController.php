@@ -17,7 +17,7 @@ class BeritaController extends Controller
         return view('dashboard.berita.index', compact('data'));
     }
 
-    public function publicIndex()
+    public function publicIndex(Request $request)
     {
         $query = Berita::with('kategoriInformasi')->where('is_active', 1)->latest();
         if ($request->filled('kategori')) {

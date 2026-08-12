@@ -20,7 +20,14 @@ class OperatorDashboardController extends Controller
         $tagihans = JenisPengajuan::where('is_active', true)
             ->where('is_tagihan_dashboard', true)
             ->where('deadline_at', '>=', now())
-            ->orderBy('deadline_at')->get();
+            ->with(['tagihanKonfirmasis' => fn ($query) => $query->where('user_id', auth()->id())])
+            ->withCount(['pengajuans as pengumpulan_operator_count' => fn ($query) => $query->where('user_id', auth()->id())])
+            ->orderBy('deadline_at')
+            ->get()
+            ->each(function (JenisPengajuan $tagihan) {
+                $tagihan->sudah_dikumpulkan = $tagihan->pengumpulan_operator_count > 0;
+                $tagihan->sudah_dibaca = $tagihan->tagihanKonfirmasis->isNotEmpty();
+            });
 
         return view('operator.dashboard', compact('notifikasi', 'pengumumans', 'tagihans'));
     }

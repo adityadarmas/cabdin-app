@@ -19,16 +19,23 @@ class OperatorSekolahSeeder extends Seeder
         while (($row = fgetcsv($handle, 0, ';')) !== false) {
             if (empty(trim($row[0] ?? ''))) continue;
 
-            User::updateOrCreate(
-                ['email' => trim($row[5])],
-                [
-                    'name'         => trim($row[4]),
-                    'nama_sekolah' => trim($row[0]),
-                    'no_wa'        => trim($row[3]),
-                    'password'     => Hash::make(trim($row[6])),
-                    'role'         => 'operator',
-                ]
-            );
+            $operator = User::firstOrNew(['email' => trim($row[5])]);
+            $operator->fill([
+                'name'           => trim($row[4]),
+                'nama_sekolah'   => trim($row[0]),
+                'npsn'           => trim($row[1]) ?: null,
+                'status_sekolah' => str_contains(strtolower(trim($row[0])), 'negeri') ? 'negeri' : 'swasta',
+                'no_wa'          => trim($row[3]),
+                'role'           => 'operator',
+            ]);
+
+            // Password dari CSV hanya dipakai saat akun baru dibuat.
+            // Akun yang sudah ada tetap dapat memakai password lamanya.
+            if (! $operator->exists) {
+                $operator->password = Hash::make(trim($row[6]));
+            }
+
+            $operator->save();
         }
 
         fclose($handle);
