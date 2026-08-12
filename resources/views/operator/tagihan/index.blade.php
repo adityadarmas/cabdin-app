@@ -23,7 +23,7 @@
                                 <span class="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700">Perlu ditindaklanjuti</span>
                             @endif
                         </div>
-                        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">{{ \Illuminate\Support\Str::limit(strip_tags($item->deskripsi), 220) }}</p>
+                        <div class="mt-2 max-w-3xl text-sm leading-6 text-slate-600 [&_a]:font-bold [&_a]:text-blue-600 [&_a]:underline [&_blockquote]:border-l-4 [&_blockquote]:border-slate-300 [&_blockquote]:pl-4 [&_ol]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_p:last-child]:mb-0 [&_ul]:ml-5 [&_ul]:list-disc">{!! $item->deskripsi !!}</div>
                         <p class="mt-3 text-xs font-bold {{ $selesai ? 'text-emerald-700' : 'text-rose-700' }}">Deadline {{ $item->deadline_at->translatedFormat('d M Y, H:i') }}</p>
                     </div>
                     <div class="flex shrink-0 flex-wrap gap-2">
@@ -32,6 +32,12 @@
                             <form method="POST" action="{{ route('operator.tagihan.confirm', $item) }}">
                                 @csrf
                                 <button class="rounded-lg border border-emerald-300 bg-white px-4 py-2.5 text-sm font-bold text-emerald-700 hover:bg-emerald-100">Tandai sudah dibaca</button>
+                            </form>
+                        @elseif($item->sudah_dibaca && ! $item->sudah_dikumpulkan)
+                            <form method="POST" action="{{ route('operator.tagihan.cancel-confirmation', $item) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button class="rounded-lg border border-amber-300 bg-white px-4 py-2.5 text-sm font-bold text-amber-700 hover:bg-amber-100">Batal tandai dibaca</button>
                             </form>
                         @endunless
                     </div>

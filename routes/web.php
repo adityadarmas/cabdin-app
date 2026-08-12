@@ -87,6 +87,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/notifikasi', [OperatorNotificationController::class, 'index'])->name('operator.notifikasi.index');
         Route::get('/tagihan', [OperatorTagihanController::class, 'index'])->name('operator.tagihan.index');
         Route::post('/tagihan/{jenisPengajuan}/konfirmasi', [OperatorTagihanController::class, 'confirm'])->name('operator.tagihan.confirm');
+        Route::delete('/tagihan/{jenisPengajuan}/konfirmasi', [OperatorTagihanController::class, 'cancelConfirmation'])->name('operator.tagihan.cancel-confirmation');
         Route::get('/akun', [OperatorAkunController::class, 'edit'])->name('operator.akun.edit');
         Route::put('/akun', [OperatorAkunController::class, 'update'])->name('operator.akun.update');
 

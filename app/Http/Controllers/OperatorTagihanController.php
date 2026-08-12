@@ -26,6 +26,17 @@ class OperatorTagihanController extends Controller
         return back()->with('success', 'Tagihan telah ditandai sudah dibaca.');
     }
 
+    public function cancelConfirmation(JenisPengajuan $jenisPengajuan)
+    {
+        abort_unless($jenisPengajuan->is_active && $jenisPengajuan->is_tagihan_dashboard, 404);
+
+        TagihanKonfirmasi::where('jenis_pengajuan_id', $jenisPengajuan->id)
+            ->where('user_id', auth()->id())
+            ->delete();
+
+        return back()->with('success', 'Tanda sudah dibaca pada tagihan telah dibatalkan.');
+    }
+
     private function tagihansUntukOperator()
     {
         return JenisPengajuan::where('is_active', true)
