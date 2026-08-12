@@ -55,6 +55,15 @@
                     @enderror
                 </div>
 
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1.5">Status Sekolah</label>
+                    <select name="status_sekolah" required class="w-full border @error('status_sekolah') border-red-400 @else border-gray-200 @enderror rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white">
+                        <option value="negeri" @selected(old('status_sekolah', $user->status_sekolah) === 'negeri')>Negeri</option>
+                        <option value="swasta" @selected(old('status_sekolah', $user->status_sekolah) === 'swasta')>Swasta</option>
+                    </select>
+                    @error('status_sekolah')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                </div>
+
                 {{-- Ganti Password --}}
                 <div class="border-t border-gray-100 pt-5">
                     <button type="button" id="togglePasswordBtn" onclick="togglePassword()"

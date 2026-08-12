@@ -21,6 +21,7 @@ class OperatorAkunController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'no_wa'    => 'nullable|string|max:20',
+            'status_sekolah' => 'required|in:negeri,swasta',
             'password' => 'nullable|string|min:6|confirmed',
         ], [
             'name.required'      => 'Nama wajib diisi.',
@@ -34,6 +35,7 @@ class OperatorAkunController extends Controller
             'name'  => $request->name,
             'email' => $request->email,
             'no_wa' => $request->no_wa,
+            'status_sekolah' => $request->status_sekolah,
         ];
 
         if ($request->filled('password')) {

@@ -25,6 +25,7 @@ class OperatorSekolahSeeder extends Seeder
                 'nama_sekolah'   => trim($row[0]),
                 'npsn'           => trim($row[1]) ?: null,
                 'status_sekolah' => str_contains(strtolower(trim($row[0])), 'negeri') ? 'negeri' : 'swasta',
+                'bentuk_pendidikan' => strtolower(trim($row[2])) === 'smk' ? 'smk' : 'sma',
                 'no_wa'          => trim($row[3]),
                 'role'           => 'operator',
             ]);

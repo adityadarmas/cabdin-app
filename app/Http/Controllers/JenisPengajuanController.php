@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisPengajuan;
 use App\Models\KategoriPengajuan;
+use App\Models\User;
+use App\Notifications\TagihanBaru;
 use Illuminate\Http\Request;
 
 class JenisPengajuanController extends Controller
@@ -21,7 +23,10 @@ class JenisPengajuanController extends Controller
 
     public function store(Request $request)
     {
-        JenisPengajuan::create($this->validated($request));
+        $jenisPengajuan = JenisPengajuan::create($this->validated($request));
+        if ($jenisPengajuan->is_active && $jenisPengajuan->is_tagihan_dashboard) {
+            $this->notifyTargetedOperators($jenisPengajuan);
+        }
         return redirect()->route('jenis-pengajuan.index')->with('success', 'Jenis pengumpulan data berhasil ditambahkan.');
     }
 
@@ -59,6 +64,8 @@ class JenisPengajuanController extends Controller
             'is_lampiran_enabled' => 'required|boolean',
             'is_tagihan_dashboard' => 'required|boolean',
             'deadline_at' => 'nullable|date',
+            'target_bentuk_pendidikan' => 'required|in:semua,sma,smk',
+            'target_status_sekolah' => 'required|in:semua,negeri,swasta',
         ]);
         $data['form_fields'] = $this->normaliseFields($data['form_fields'] ?? '');
         if ($data['is_tagihan_dashboard'] && empty($data['deadline_at'])) {
@@ -82,5 +89,14 @@ class JenisPengajuanController extends Controller
     private function activeCategories()
     {
         return KategoriPengajuan::where('is_active', true)->orderBy('urutan')->get();
+    }
+
+    private function notifyTargetedOperators(JenisPengajuan $jenisPengajuan): void
+    {
+        $operators = User::where('role', 'operator')
+            ->when($jenisPengajuan->target_bentuk_pendidikan !== 'semua', fn ($query) => $query->where('bentuk_pendidikan', $jenisPengajuan->target_bentuk_pendidikan))
+            ->when($jenisPengajuan->target_status_sekolah !== 'semua', fn ($query) => $query->where('status_sekolah', $jenisPengajuan->target_status_sekolah))
+            ->get();
+        $operators->each->notify(new TagihanBaru($jenisPengajuan));
     }
 }

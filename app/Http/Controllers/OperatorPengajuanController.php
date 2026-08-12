@@ -141,6 +141,8 @@ class OperatorPengajuanController extends Controller
         return JenisPengajuan::with('kategoriPengajuan')
             ->where('is_active', true)
             ->whereHas('kategoriPengajuan', fn ($query) => $query->where('is_active', true))
+            ->where(fn ($query) => $query->where('target_bentuk_pendidikan', 'semua')->orWhere('target_bentuk_pendidikan', auth()->user()->bentuk_pendidikan))
+            ->where(fn ($query) => $query->where('target_status_sekolah', 'semua')->orWhere('target_status_sekolah', auth()->user()->status_sekolah))
             ->orderBy('urutan')
             ->get()
             ->sortBy(fn (JenisPengajuan $jenis) => (($jenis->kategoriPengajuan?->urutan ?? 9999) * 10000) + $jenis->urutan)

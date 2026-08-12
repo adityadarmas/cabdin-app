@@ -10,8 +10,9 @@ class OperatorDashboardController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $notifikasi = $user->unreadNotifications()->latest()->limit(8)->get();
-        $user->unreadNotifications()->update(['read_at' => now()]);
+        $notificationQuery = $user->unreadNotifications()->whereIn('data->notification_type', ['status_pengumpulan_data', 'tagihan_baru']);
+        $notifikasi = (clone $notificationQuery)->latest()->limit(8)->get();
+        $notificationQuery->update(['read_at' => now()]);
         $pengumumans = Pengumuman::where('is_active', true)
             ->where(fn ($query) => $query->whereNull('published_at')->orWhere('published_at', '<=', now()))
             ->latest('published_at')
@@ -20,6 +21,8 @@ class OperatorDashboardController extends Controller
         $tagihans = JenisPengajuan::where('is_active', true)
             ->where('is_tagihan_dashboard', true)
             ->where('deadline_at', '>=', now())
+            ->where(fn ($query) => $query->where('target_bentuk_pendidikan', 'semua')->orWhere('target_bentuk_pendidikan', $user->bentuk_pendidikan))
+            ->where(fn ($query) => $query->where('target_status_sekolah', 'semua')->orWhere('target_status_sekolah', $user->status_sekolah))
             ->with(['tagihanKonfirmasis' => fn ($query) => $query->where('user_id', auth()->id())])
             ->withCount(['pengajuans as pengumpulan_operator_count' => fn ($query) => $query->where('user_id', auth()->id())])
             ->orderBy('deadline_at')

@@ -23,6 +23,7 @@ class User extends Authenticatable
         'nama_sekolah',
         'npsn',
         'status_sekolah',
+        'bentuk_pendidikan',
         'no_wa',
         'email',
         'role',

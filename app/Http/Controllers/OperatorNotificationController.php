@@ -9,8 +9,9 @@ class OperatorNotificationController extends Controller
     public function index()
     {
         $user = auth()->user();
-        $notifications = $user->unreadNotifications()->latest()->paginate(20);
-        $user->unreadNotifications()->update(['read_at' => now()]);
+        $query = $user->unreadNotifications()->whereIn('data->notification_type', ['status_pengumpulan_data', 'tagihan_baru']);
+        $notifications = (clone $query)->latest()->paginate(20);
+        $query->update(['read_at' => now()]);
 
         return view('operator.notifikasi.index', compact('notifications'));
     }
@@ -20,8 +21,8 @@ class OperatorNotificationController extends Controller
         $user = auth()->user();
 
         return response()->json([
-            'unread_count' => $user->unreadNotifications()->count(),
-            'notifications' => $user->unreadNotifications()->latest()->limit(10)->get()
+            'unread_count' => $user->unreadNotifications()->whereIn('data->notification_type', ['status_pengumpulan_data', 'tagihan_baru'])->count(),
+            'notifications' => $user->unreadNotifications()->whereIn('data->notification_type', ['status_pengumpulan_data', 'tagihan_baru'])->latest()->limit(10)->get()
                 ->map(fn ($notification) => [
                     'id' => $notification->id,
                     'title' => $notification->data['title'] ?? 'Notifikasi',

@@ -48,6 +48,7 @@ class UserAccessController extends Controller
             'role'     => 'required|in:admin,staff,tu,pimpinan,operator',
             'npsn'     => 'nullable|digits:8|unique:users,npsn',
             'status_sekolah' => 'nullable|in:negeri,swasta',
+            'bentuk_pendidikan' => 'nullable|in:sma,smk',
         ], [
             'name.required'      => 'Nama wajib diisi.',
             'email.required'     => 'Email wajib diisi.',
@@ -65,6 +66,7 @@ class UserAccessController extends Controller
             'role'     => $request->role,
             'npsn'     => $request->role === 'operator' ? $request->npsn : null,
             'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
+            'bentuk_pendidikan' => $request->role === 'operator' ? $request->bentuk_pendidikan : null,
         ]);
 
         return redirect()->route('admin.users.index')
@@ -84,6 +86,7 @@ class UserAccessController extends Controller
             'nama_sekolah' => 'nullable|string|max:255',
             'npsn'         => ['nullable', 'digits:8', Rule::unique('users', 'npsn')->ignore($user->id)],
             'status_sekolah' => 'nullable|in:negeri,swasta',
+            'bentuk_pendidikan' => 'nullable|in:sma,smk',
             'password'     => 'nullable|string|min:6|confirmed',
         ], [
             'name.required'      => 'Nama wajib diisi.',
@@ -101,6 +104,7 @@ class UserAccessController extends Controller
             'nama_sekolah' => $request->role === 'operator' ? $request->nama_sekolah : null,
             'npsn'         => $request->role === 'operator' ? $request->npsn : null,
             'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
+            'bentuk_pendidikan' => $request->role === 'operator' ? $request->bentuk_pendidikan : null,
         ];
 
         if ($request->filled('password')) {

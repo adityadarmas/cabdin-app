@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class JenisPengajuan extends Model
 {
-    protected $fillable = ['kategori_pengajuan_id', 'nama', 'deskripsi', 'form_fields', 'urutan', 'is_active', 'is_keterangan_enabled', 'is_lampiran_enabled', 'is_tagihan_dashboard', 'deadline_at'];
+    protected $fillable = ['kategori_pengajuan_id', 'nama', 'deskripsi', 'form_fields', 'urutan', 'is_active', 'is_keterangan_enabled', 'is_lampiran_enabled', 'is_tagihan_dashboard', 'deadline_at', 'target_bentuk_pendidikan', 'target_status_sekolah'];
 
     protected $casts = [
         'form_fields' => 'array',

@@ -31,6 +31,8 @@ class OperatorTagihanController extends Controller
         return JenisPengajuan::where('is_active', true)
             ->where('is_tagihan_dashboard', true)
             ->where('deadline_at', '>=', now())
+            ->where(fn ($query) => $query->where('target_bentuk_pendidikan', 'semua')->orWhere('target_bentuk_pendidikan', auth()->user()->bentuk_pendidikan))
+            ->where(fn ($query) => $query->where('target_status_sekolah', 'semua')->orWhere('target_status_sekolah', auth()->user()->status_sekolah))
             ->with(['tagihanKonfirmasis' => fn ($query) => $query->where('user_id', auth()->id())])
             ->withCount(['pengajuans as pengumpulan_operator_count' => fn ($query) => $query->where('user_id', auth()->id())])
             ->orderBy('deadline_at')

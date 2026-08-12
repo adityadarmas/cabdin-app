@@ -4,10 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Berita;
 use App\Models\KategoriInformasi;
-use App\Models\User;
-use App\Notifications\BeritaPublished;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Notification;
 
 class BeritaController extends Controller
 {
@@ -65,13 +62,6 @@ class BeritaController extends Controller
         }
 
         $berita = Berita::create($validated)->refresh();
-
-        if ($berita->is_active) {
-            Notification::send(
-                User::where('role', 'operator')->get(),
-                new BeritaPublished($berita)
-            );
-        }
 
         return redirect()
             ->route('berita.index')
