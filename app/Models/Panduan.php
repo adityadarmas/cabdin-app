@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Panduan extends Model
 {
-    protected $fillable = ['judul', 'tipe', 'konten', 'video_url', 'urutan', 'is_active'];
+    protected $fillable = ['judul', 'tipe', 'konten', 'video_url', 'gambar', 'lampiran', 'urutan', 'is_active'];
 
     protected $casts = ['is_active' => 'boolean'];
 }

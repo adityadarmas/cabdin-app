@@ -8,7 +8,7 @@ class Pengumuman extends Model
 {
     protected $table = 'pengumumans';
 
-    protected $fillable = ['judul', 'isi', 'is_active', 'published_at'];
+    protected $fillable = ['judul', 'isi', 'gambar', 'lampiran', 'is_active', 'published_at'];
 
     protected $casts = [
         'is_active' => 'boolean',

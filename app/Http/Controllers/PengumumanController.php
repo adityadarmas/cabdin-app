@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengumuman;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PengumumanController extends Controller
 {
@@ -21,7 +22,9 @@ class PengumumanController extends Controller
 
     public function store(Request $request)
     {
-        Pengumuman::create($this->validated($request));
+        $data = $this->validated($request);
+        $this->storeFiles($request, $data);
+        Pengumuman::create($data);
 
         return redirect()->route('pengumuman.index')->with('success', 'Pengumuman berhasil diterbitkan.');
     }
@@ -33,13 +36,16 @@ class PengumumanController extends Controller
 
     public function update(Request $request, Pengumuman $pengumuman)
     {
-        $pengumuman->update($this->validated($request));
+        $data = $this->validated($request);
+        $this->storeFiles($request, $data, $pengumuman);
+        $pengumuman->update($data);
 
         return redirect()->route('pengumuman.index')->with('success', 'Pengumuman berhasil diperbarui.');
     }
 
     public function destroy(Pengumuman $pengumuman)
     {
+        Storage::disk('public')->delete(array_filter([$pengumuman->gambar, $pengumuman->lampiran]));
         $pengumuman->delete();
 
         return back()->with('success', 'Pengumuman berhasil dihapus.');
@@ -52,6 +58,18 @@ class PengumumanController extends Controller
             'isi' => 'required|string|max:5000',
             'is_active' => 'required|boolean',
             'published_at' => 'nullable|date',
+            'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'lampiran' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:10240',
         ]);
+    }
+
+    private function storeFiles(Request $request, array &$data, ?Pengumuman $pengumuman = null): void
+    {
+        foreach (['gambar', 'lampiran'] as $field) {
+            if ($request->hasFile($field)) {
+                if ($pengumuman?->{$field}) Storage::disk('public')->delete($pengumuman->{$field});
+                $data[$field] = $request->file($field)->store('pengumuman', 'public');
+            }
+        }
     }
 }
