@@ -1,8 +1,32 @@
-@extends('layouts.app')
+@extends('layouts.dashboard')
 
 @section('content')
-<div class="max-w-6xl mx-auto">
-    <div class="mb-6 flex items-center justify-between gap-4"><div><h1 class="text-2xl font-extrabold text-slate-800">Panduan Operator</h1><p class="mt-1 text-sm text-slate-500">Artikel dan video panduan yang tampil di dashboard operator sekolah.</p></div><a href="{{ route('panduan.create') }}" class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700">+ Tambah Panduan</a></div>
-    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-4">Panduan</th><th class="px-5 py-4">Tipe</th><th class="px-5 py-4">Urutan</th><th class="px-5 py-4">Status</th><th class="px-5 py-4 text-right">Aksi</th></tr></thead><tbody class="divide-y divide-slate-100">@forelse($panduans as $item)<tr><td class="px-5 py-4"><p class="font-bold text-slate-800">{{ $item->judul }}</p><p class="mt-1 max-w-2xl truncate text-xs text-slate-500">{{ $item->tipe === 'video' ? $item->video_url : strip_tags($item->konten) }}</p></td><td class="px-5 py-4"><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">{{ ucfirst($item->tipe) }}</span></td><td class="px-5 py-4 text-slate-600">{{ $item->urutan }}</td><td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $item->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">{{ $item->is_active ? 'Aktif' : 'Nonaktif' }}</span></td><td class="px-5 py-4 text-right"><a class="text-xs font-bold text-blue-600 hover:underline" href="{{ route('panduan.edit', $item) }}">Edit</a><form class="inline" method="POST" action="{{ route('panduan.destroy', $item) }}" onsubmit="return confirm('Hapus panduan ini?')">@csrf @method('DELETE')<button class="ml-3 text-xs font-bold text-red-600 hover:underline">Hapus</button></form></td></tr>@empty<tr><td colspan="5" class="px-5 py-14 text-center text-slate-400">Belum ada panduan.</td></tr>@endforelse</tbody></table></div><div class="mt-5">{{ $panduans->links() }}</div>
-</div>
+    <div class="mb-6 flex items-center justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-800">Panduan Operator</h1>
+            <p class="mt-1 text-sm text-slate-500">Artikel panduan yang tampil di dashboard operator sekolah.</p>
+        </div>
+        <a href="{{ route('panduan.create') }}" class="rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-blue-700">+ Tambah Artikel</a>
+    </div>
+
+    <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <table class="min-w-full text-sm">
+            <thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
+                <tr><th class="px-5 py-4">Artikel Panduan</th><th class="px-5 py-4">Urutan</th><th class="px-5 py-4">Status</th><th class="px-5 py-4 text-right">Aksi</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @forelse($panduans as $item)
+                    <tr>
+                        <td class="px-5 py-4"><p class="font-bold text-slate-800">{{ $item->judul }}</p><p class="mt-1 max-w-2xl truncate text-xs text-slate-500">{{ strip_tags($item->konten) }}</p></td>
+                        <td class="px-5 py-4 text-slate-600">{{ $item->urutan }}</td>
+                        <td class="px-5 py-4"><span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $item->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-500' }}">{{ $item->is_active ? 'Aktif' : 'Nonaktif' }}</span></td>
+                        <td class="px-5 py-4 text-right"><a class="text-xs font-bold text-blue-600 hover:underline" href="{{ route('panduan.edit', $item) }}">Edit</a><form class="inline" method="POST" action="{{ route('panduan.destroy', $item) }}" onsubmit="return confirm('Hapus panduan ini?')">@csrf @method('DELETE')<button class="ml-3 text-xs font-bold text-red-600 hover:underline">Hapus</button></form></td>
+                    </tr>
+                @empty
+                    <tr><td colspan="4" class="px-5 py-14 text-center text-slate-400">Belum ada panduan.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-5">{{ $panduans->links() }}</div>
 @endsection

@@ -16,7 +16,7 @@ class PanduanController extends Controller
 
     public function create()
     {
-        return view('dashboard.panduan.form', ['panduan' => new Panduan(['tipe' => 'artikel', 'urutan' => 1, 'is_active' => true])]);
+        return view('dashboard.panduan.form', ['panduan' => new Panduan(['urutan' => 1, 'is_active' => true])]);
     }
 
     public function store(Request $request)
@@ -51,9 +51,7 @@ class PanduanController extends Controller
     {
         return $request->validate([
             'judul' => 'required|string|max:255',
-            'tipe' => 'required|in:artikel,video',
-            'konten' => 'nullable|string|max:10000|required_if:tipe,artikel',
-            'video_url' => 'nullable|url|max:1000|required_if:tipe,video',
+            'konten' => 'required|string|max:10000',
             'urutan' => 'required|integer|min:1',
             'is_active' => 'required|boolean',
             'gambar' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',

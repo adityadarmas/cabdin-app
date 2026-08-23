@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('lampiran')->nullable()->after('gambar');
         });
         Schema::table('panduans', function (Blueprint $table) {
-            $table->string('gambar')->nullable()->after('video_url');
+            $table->string('gambar')->nullable()->after('konten');
             $table->string('lampiran')->nullable()->after('gambar');
         });
     }

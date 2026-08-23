@@ -22,20 +22,15 @@
             </div>
 
             <section class="overflow-hidden rounded-2xl border border-violet-100 bg-white shadow-sm">
-                <div class="bg-violet-50 px-5 py-4"><h2 class="font-extrabold text-violet-900">Panduan Operator</h2><p class="mt-0.5 text-xs text-violet-700">Artikel dan video untuk membantu penggunaan layanan.</p></div>
+                <div class="bg-violet-50 px-5 py-4"><h2 class="font-extrabold text-violet-900">Panduan Operator</h2><p class="mt-0.5 text-xs text-violet-700">Artikel untuk membantu penggunaan layanan.</p></div>
                 <div class="grid gap-4 p-5 md:grid-cols-2 xl:grid-cols-3">
                     @forelse($panduans as $panduan)
                         <article class="rounded-xl border border-slate-200 bg-white p-4">
-                            <div class="flex items-center gap-2"><span class="rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider {{ $panduan->tipe === 'video' ? 'bg-rose-100 text-rose-700' : 'bg-violet-100 text-violet-700' }}">{{ $panduan->tipe }}</span></div>
                             <h3 class="mt-3 font-extrabold text-slate-800">{{ $panduan->judul }}</h3>
                             @if($panduan->gambar)
                                 <img class="mt-3 h-36 w-full rounded-lg object-cover" src="{{ asset('storage/'.$panduan->gambar) }}" alt="{{ $panduan->judul }}">
                             @endif
-                            @if($panduan->tipe === 'video')
-                                <a href="{{ $panduan->video_url }}" target="_blank" rel="noopener noreferrer" class="mt-4 inline-flex rounded-lg bg-rose-50 px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-100">Tonton video &rarr;</a>
-                            @else
-                                <details class="group mt-3"><summary class="cursor-pointer text-xs font-bold text-violet-700">Baca artikel</summary><div class="mt-3 text-sm leading-6 text-slate-600 [&_a]:font-bold [&_a]:text-blue-600 [&_ol]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:ml-5 [&_ul]:list-disc">{!! $panduan->konten !!}</div></details>
-                            @endif
+                            <details class="group mt-3"><summary class="cursor-pointer text-xs font-bold text-violet-700">Baca artikel</summary><div class="mt-3 text-sm leading-6 text-slate-600 [&_a]:font-bold [&_a]:text-blue-600 [&_ol]:ml-5 [&_ol]:list-decimal [&_p]:mb-2 [&_ul]:ml-5 [&_ul]:list-disc">{!! $panduan->konten !!}</div></details>
                             @if($panduan->lampiran)
                                 <a target="_blank" href="{{ asset('storage/'.$panduan->lampiran) }}" class="mt-3 inline-flex rounded-lg bg-violet-50 px-3 py-2 text-xs font-bold text-violet-700 hover:bg-violet-100">Buka lampiran</a>
                             @endif
