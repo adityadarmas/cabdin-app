@@ -209,7 +209,7 @@
                     <input type="text" id="edit_nama_sekolah" name="nama_sekolah"
                         class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                         placeholder="Masukkan nama sekolah">
-                    <div class="mt-3 grid grid-cols-2 gap-3"><div><label class="block text-xs font-medium text-gray-600 mb-1.5">NPSN</label><input type="text" id="edit_npsn" name="npsn" inputmode="numeric" maxlength="8" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="8 digit"></div><div><label class="block text-xs font-medium text-gray-600 mb-1.5">Status</label><select id="edit_status_sekolah" name="status_sekolah" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white"><option value="">Pilih</option><option value="negeri">Negeri</option><option value="swasta">Swasta</option></select></div></div>
+                    <div class="mt-3 grid grid-cols-2 gap-3"><div><label class="block text-xs font-medium text-gray-600 mb-1.5">NPSN</label><input type="text" id="edit_npsn" name="npsn" inputmode="numeric" maxlength="8" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="8 digit"></div><div><label class="block text-xs font-medium text-gray-600 mb-1.5">Status</label><input type="text" id="edit_status_sekolah" class="w-full border border-gray-200 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600" readonly><p class="mt-1 text-[10px] text-gray-400">Otomatis dari nama sekolah.</p></div></div>
                 </div>
 
                 {{-- Divider ganti password --}}
@@ -282,7 +282,7 @@
         document.getElementById('edit_role').value  = role;
         document.getElementById('edit_nama_sekolah').value = namaSekolah || '';
         document.getElementById('edit_npsn').value = npsn || '';
-        document.getElementById('edit_status_sekolah').value = statusSekolah || '';
+        updateStatusSekolahOtomatis();
         document.getElementById('edit_password').value = '';
         document.getElementById('edit_password_confirmation').value = '';
         document.getElementById('modal_subtitle').textContent = email;
@@ -303,6 +303,13 @@
         const wrapper = document.getElementById('namaSekolahWrapper');
         wrapper.classList.toggle('hidden', role !== 'operator');
     }
+
+    function updateStatusSekolahOtomatis() {
+        const namaSekolah = document.getElementById('edit_nama_sekolah').value.toLowerCase();
+        document.getElementById('edit_status_sekolah').value = namaSekolah.includes('negeri') ? 'Negeri' : 'Swasta';
+    }
+
+    document.getElementById('edit_nama_sekolah').addEventListener('input', updateStatusSekolahOtomatis);
 
     function closeEditModal() {
         document.getElementById('modalEditAkun').classList.add('hidden');

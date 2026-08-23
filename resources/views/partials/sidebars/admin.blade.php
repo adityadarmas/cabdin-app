@@ -42,6 +42,13 @@
                 Pengumuman
             </a>
         </li>
+        <li>
+            <a href="{{ route('panduan.index') }}"
+               class="block px-4 py-2 rounded-lg transition
+                      {{ request()->routeIs('panduan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
+                Panduan Operator
+            </a>
+        </li>
         <!-- Dashboard berita-->
         <li>
             <a href="{{ route('berita.index') }}"

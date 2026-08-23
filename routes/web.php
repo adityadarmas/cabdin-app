@@ -24,6 +24,7 @@ use App\Http\Controllers\OperatorTagihanController;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\KategoriPengajuanController;
 use App\Http\Controllers\KategoriInformasiController;
+use App\Http\Controllers\PanduanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -144,6 +145,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('kategori-pengajuan', KategoriPengajuanController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('kategori-informasi', KategoriInformasiController::class)->only(['index', 'store', 'update', 'destroy']);
         Route::resource('pengumuman', PengumumanController::class)->except(['show']);
+        Route::resource('panduan', PanduanController::class)->except(['show']);
 
         Route::get('/register', [RegisterController::class, 'showRegister'])->name('admin.register');
         Route::post('/register', [RegisterController::class, 'register']);

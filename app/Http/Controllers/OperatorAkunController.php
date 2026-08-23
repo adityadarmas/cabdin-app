@@ -21,7 +21,6 @@ class OperatorAkunController extends Controller
             'name'     => 'required|string|max:255',
             'email'    => ['required', 'email', Rule::unique('users')->ignore($user->id)],
             'no_wa'    => 'nullable|string|max:20',
-            'status_sekolah' => 'required|in:negeri,swasta',
             'password' => 'nullable|string|min:6|confirmed',
         ], [
             'name.required'      => 'Nama wajib diisi.',
@@ -35,7 +34,7 @@ class OperatorAkunController extends Controller
             'name'  => $request->name,
             'email' => $request->email,
             'no_wa' => $request->no_wa,
-            'status_sekolah' => $request->status_sekolah,
+            'status_sekolah' => $this->inferStatusSekolah($user->nama_sekolah),
         ];
 
         if ($request->filled('password')) {
@@ -46,5 +45,10 @@ class OperatorAkunController extends Controller
 
         return redirect()->route('operator.akun.edit')
                          ->with('success', 'Akun berhasil diperbarui.');
+    }
+
+    private function inferStatusSekolah(?string $namaSekolah): string
+    {
+        return str_contains(strtolower((string) $namaSekolah), 'negeri') ? 'negeri' : 'swasta';
     }
 }

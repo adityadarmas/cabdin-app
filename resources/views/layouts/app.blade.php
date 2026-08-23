@@ -28,7 +28,7 @@
     </header>
     <div id="sidebar-backdrop" class="fixed inset-0 z-40 hidden bg-slate-950/45 md:hidden"></div>
     <div class="flex min-h-[calc(100vh-64px)]">
-        <aside id="sidebar" class="app-sidebar fixed inset-y-16 left-0 z-50 w-68 overflow-y-auto -translate-x-full transition-transform duration-200 md:static md:translate-x-0 md:shrink-0"><div class="px-6 pt-6 pb-3 text-[10px] font-bold uppercase tracking-[.16em] text-white/45">Menu {{ auth()->user()->role }}</div>@include('partials.sidebars.' . auth()->user()->role)</aside>
+        <aside id="sidebar" class="app-sidebar fixed inset-y-16 left-0 z-50 w-68 overflow-y-auto -translate-x-full transition-transform duration-200 md:sticky md:inset-y-auto md:left-auto md:top-16 md:h-[calc(100vh-4rem)] md:self-start md:translate-x-0 md:shrink-0"><div class="px-6 pt-6 pb-3 text-[10px] font-bold uppercase tracking-[.16em] text-white/45">Menu {{ auth()->user()->role }}</div>@include('partials.sidebars.' . auth()->user()->role)</aside>
         <main class="content-surface min-w-0 flex-1 p-4 md:p-7">@include('partials.alert')@yield('content')</main>
     </div>
     <script>

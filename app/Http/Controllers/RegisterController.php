@@ -23,7 +23,6 @@ class RegisterController extends Controller
             'role'         => 'required|in:admin,staff,tu,pimpinan,operator',
             'nama_sekolah' => 'required_if:role,operator|nullable|string|max:255',
             'npsn'         => 'required_if:role,operator|nullable|digits:8|unique:users,npsn',
-            'status_sekolah' => 'required_if:role,operator|nullable|in:negeri,swasta',
             'bentuk_pendidikan' => 'required_if:role,operator|nullable|in:sma,smk',
             'no_wa'        => 'required_if:role,operator|nullable|string|max:20',
             'password'     => 'required|string|min:8|confirmed',
@@ -33,7 +32,7 @@ class RegisterController extends Controller
             'name'         => $request->name,
             'nama_sekolah' => $request->role === 'operator' ? $request->nama_sekolah : null,
             'npsn'         => $request->role === 'operator' ? $request->npsn : null,
-            'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
+            'status_sekolah' => $request->role === 'operator' ? $this->inferStatusSekolah($request->nama_sekolah) : null,
             'bentuk_pendidikan' => $request->role === 'operator' ? $request->bentuk_pendidikan : null,
             'no_wa'        => $request->role === 'operator' ? $request->no_wa : null,
             'email'        => $request->email,
@@ -42,5 +41,10 @@ class RegisterController extends Controller
         ]);
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
+    }
+
+    private function inferStatusSekolah(?string $namaSekolah): string
+    {
+        return str_contains(strtolower((string) $namaSekolah), 'negeri') ? 'negeri' : 'swasta';
     }
 }

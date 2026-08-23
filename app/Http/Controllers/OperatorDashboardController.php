@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Pengumuman;
 use App\Models\JenisPengajuan;
+use App\Models\Panduan;
 
 class OperatorDashboardController extends Controller
 {
@@ -18,6 +19,7 @@ class OperatorDashboardController extends Controller
             ->latest('published_at')
             ->limit(8)
             ->get();
+        $panduans = Panduan::where('is_active', true)->orderBy('urutan')->latest()->limit(6)->get();
         $tagihans = JenisPengajuan::where('is_active', true)
             ->where('is_tagihan_dashboard', true)
             ->where('deadline_at', '>=', now())
@@ -32,6 +34,6 @@ class OperatorDashboardController extends Controller
                 $tagihan->sudah_dibaca = $tagihan->tagihanKonfirmasis->isNotEmpty();
             });
 
-        return view('operator.dashboard', compact('notifikasi', 'pengumumans', 'tagihans'));
+        return view('operator.dashboard', compact('notifikasi', 'pengumumans', 'tagihans', 'panduans'));
     }
 }

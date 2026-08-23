@@ -47,7 +47,6 @@ class UserAccessController extends Controller
             'password' => 'required|string|min:6|confirmed',
             'role'     => 'required|in:admin,staff,tu,pimpinan,operator',
             'npsn'     => 'nullable|digits:8|unique:users,npsn',
-            'status_sekolah' => 'nullable|in:negeri,swasta',
             'bentuk_pendidikan' => 'nullable|in:sma,smk',
         ], [
             'name.required'      => 'Nama wajib diisi.',
@@ -65,7 +64,7 @@ class UserAccessController extends Controller
             'password' => Hash::make($request->password),
             'role'     => $request->role,
             'npsn'     => $request->role === 'operator' ? $request->npsn : null,
-            'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
+            'status_sekolah' => $request->role === 'operator' ? $this->inferStatusSekolah($request->nama_sekolah) : null,
             'bentuk_pendidikan' => $request->role === 'operator' ? $request->bentuk_pendidikan : null,
         ]);
 
@@ -85,7 +84,6 @@ class UserAccessController extends Controller
             'role'         => 'required|in:admin,staff,tu,pimpinan,operator',
             'nama_sekolah' => 'nullable|string|max:255',
             'npsn'         => ['nullable', 'digits:8', Rule::unique('users', 'npsn')->ignore($user->id)],
-            'status_sekolah' => 'nullable|in:negeri,swasta',
             'bentuk_pendidikan' => 'nullable|in:sma,smk',
             'password'     => 'nullable|string|min:6|confirmed',
         ], [
@@ -103,7 +101,7 @@ class UserAccessController extends Controller
             'role'         => $request->role,
             'nama_sekolah' => $request->role === 'operator' ? $request->nama_sekolah : null,
             'npsn'         => $request->role === 'operator' ? $request->npsn : null,
-            'status_sekolah' => $request->role === 'operator' ? $request->status_sekolah : null,
+            'status_sekolah' => $request->role === 'operator' ? $this->inferStatusSekolah($request->nama_sekolah) : null,
             'bentuk_pendidikan' => $request->role === 'operator' ? $request->bentuk_pendidikan : null,
         ];
 
@@ -171,5 +169,10 @@ class UserAccessController extends Controller
 
         return redirect()->route('login')
                          ->with('success', 'Akun admin default berhasil dibuat. Email: admin@ecabdin.id | Password: Admin@12345');
+    }
+
+    private function inferStatusSekolah(?string $namaSekolah): string
+    {
+        return str_contains(strtolower((string) $namaSekolah), 'negeri') ? 'negeri' : 'swasta';
     }
 }

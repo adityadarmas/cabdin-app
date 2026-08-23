@@ -4,8 +4,8 @@
 <div class="p-6 max-w-xl">
 
     <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Edit Akun</h1>
-        <p class="text-sm text-gray-500 mt-0.5">Perbarui informasi akun Anda</p>
+        <h1 class="text-2xl font-bold text-gray-800">Setting</h1>
+        <p class="text-sm text-gray-500 mt-0.5">Kelola informasi dan keamanan akun Anda</p>
     </div>
 
     @if (session('success'))
@@ -57,11 +57,8 @@
 
                 <div>
                     <label class="block text-xs font-medium text-gray-600 mb-1.5">Status Sekolah</label>
-                    <select name="status_sekolah" required class="w-full border @error('status_sekolah') border-red-400 @else border-gray-200 @enderror rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white">
-                        <option value="negeri" @selected(old('status_sekolah', $user->status_sekolah) === 'negeri')>Negeri</option>
-                        <option value="swasta" @selected(old('status_sekolah', $user->status_sekolah) === 'swasta')>Swasta</option>
-                    </select>
-                    @error('status_sekolah')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
+                    <div class="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-semibold text-gray-700">{{ str_contains(strtolower((string) $user->nama_sekolah), 'negeri') ? 'Negeri' : 'Swasta' }}</div>
+                    <p class="mt-1 text-xs text-gray-400">Ditentukan otomatis dari nama sekolah.</p>
                 </div>
 
                 {{-- Ganti Password --}}

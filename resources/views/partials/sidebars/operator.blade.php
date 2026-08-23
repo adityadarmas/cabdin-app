@@ -11,34 +11,23 @@
         </li>
 
         <li>
-            <a href="{{ route('operator.produk.index') }}"
-               class="block px-4 py-2 rounded-lg transition
-                      {{ request()->routeIs('operator.produk.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Manajemen Produk
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ route('operator.pengajuan.index') }}"
-               class="block px-4 py-2 rounded-lg transition
-                      {{ request()->routeIs('operator.pengajuan.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Pengumpulan Data Saya
-            </a>
-        </li>
-
-        <li>
-            <a href="{{ route('operator.notifikasi.index') }}"
-               class="block px-4 py-2 rounded-lg transition
-                      {{ request()->routeIs('operator.notifikasi.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Notifikasi
-            </a>
+            <details @if(request()->routeIs('operator.pengajuan.*') || request()->routeIs('operator.produk.*')) open @endif>
+                <summary class="flex cursor-pointer items-center justify-between rounded-lg px-4 py-2 transition {{ request()->routeIs('operator.pengajuan.*') || request()->routeIs('operator.produk.*') ? 'bg-slate-600 text-white' : 'hover:bg-slate-400' }}">
+                    <span>Menu</span>
+                    <svg class="h-4 w-4 transition-transform [[open]_&]:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/></svg>
+                </summary>
+                <ul class="mt-1 space-y-1 border-l border-white/20 pl-3">
+                    <li><a href="{{ route('operator.pengajuan.index') }}" class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('operator.pengajuan.*') ? 'bg-white/15 text-white' : 'hover:bg-white/10' }}">Pengumpulan Data</a></li>
+                    <li><a href="{{ route('operator.produk.index') }}" class="block rounded-lg px-3 py-2 text-sm transition {{ request()->routeIs('operator.produk.*') ? 'bg-white/15 text-white' : 'hover:bg-white/10' }}">Manajemen Produk</a></li>
+                </ul>
+            </details>
         </li>
 
         <li>
             <a href="{{ route('operator.akun.edit') }}"
                class="block px-4 py-2 rounded-lg transition
                       {{ request()->routeIs('operator.akun.*') ? 'bg-slate-600' : 'hover:bg-slate-400' }}">
-                Edit Akun
+                Setting
             </a>
         </li>
 

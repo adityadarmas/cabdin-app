@@ -40,14 +40,20 @@
         @if ($jenisPengajuan->is_tagihan_dashboard)
             @php
                 $terkumpul = $rekapTagihan->where('pengumpulan_tagihan_count', '>', 0)->count();
-                $dibaca = $rekapTagihan->filter(fn ($operator) => $operator->pengumpulan_tagihan_count === 0 && $operator->tagihanKonfirmasis->isNotEmpty())->count();
+                $belumTerkumpul = $rekapTagihan->count() - $terkumpul;
+                $sekolahTerkumpul = $rekapTagihan->filter(fn ($operator) => $operator->pengumpulan_tagihan_count > 0);
+                $sekolahBelumTerkumpul = $rekapTagihan->filter(fn ($operator) => $operator->pengumpulan_tagihan_count === 0);
             @endphp
             <section class="mt-5 overflow-hidden rounded-2xl border border-emerald-200 bg-white shadow-sm">
                 <div class="flex flex-col gap-3 border-b border-emerald-100 bg-emerald-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                    <div><h2 class="font-extrabold text-emerald-900">Rekap Sekolah Tagihan</h2><p class="mt-1 text-xs text-emerald-700">{{ $terkumpul }} sudah mengumpulkan · {{ $dibaca }} sudah membaca · {{ $rekapTagihan->count() - $terkumpul - $dibaca }} belum ditindaklanjuti</p></div>
+                    <div><h2 class="font-extrabold text-emerald-900">Rekap Sekolah Tagihan</h2><p class="mt-1 text-xs text-emerald-700">Klik kartu status untuk melihat detail sekolah.</p></div>
                     <span class="text-xs font-bold text-emerald-700">Deadline {{ $jenisPengajuan->deadline_at?->translatedFormat('d M Y, H:i') }}</span>
                 </div>
-                <div class="overflow-x-auto"><table class="min-w-full text-sm"><thead class="bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500"><tr><th class="px-5 py-3">Sekolah</th><th class="px-5 py-3">Operator</th><th class="px-5 py-3">Status</th><th class="px-5 py-3">Waktu</th></tr></thead><tbody class="divide-y divide-slate-100">@forelse($rekapTagihan as $operator)<tr><td class="px-5 py-3 font-bold text-slate-700">{{ $operator->nama_sekolah ?: '-' }}</td><td class="px-5 py-3 text-slate-600">{{ $operator->name }}</td><td class="px-5 py-3">@if($operator->pengumpulan_tagihan_count > 0)<span class="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">Sudah mengumpulkan</span>@elseif($operator->tagihanKonfirmasis->isNotEmpty())<span class="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-700">Sudah dibaca</span>@else<span class="rounded-full bg-rose-100 px-2.5 py-1 text-xs font-bold text-rose-700">Belum ditindaklanjuti</span>@endif</td><td class="px-5 py-3 text-xs text-slate-500">@if($operator->pengumpulan_tagihan_count > 0){{ $operator->pengajuans->first()?->submitted_at?->translatedFormat('d M Y, H:i') }}@elseif($operator->tagihanKonfirmasis->isNotEmpty()){{ $operator->tagihanKonfirmasis->first()->dibaca_at?->translatedFormat('d M Y, H:i') }}@else-@endif</td></tr>@empty<tr><td colspan="4" class="px-5 py-10 text-center text-slate-400">Belum ada operator sekolah.</td></tr>@endforelse</tbody></table></div>
+                <div class="grid gap-3 p-5 sm:grid-cols-3">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Jumlah Sekolah</p><p class="mt-2 text-3xl font-extrabold text-slate-800">{{ $rekapTagihan->count() }}</p><p class="mt-1 text-xs text-slate-500">Sekolah operator terdaftar</p></div>
+                    <details class="group rounded-xl border border-emerald-200 bg-emerald-50 p-4"><summary class="cursor-pointer list-none"><p class="text-xs font-bold uppercase tracking-wider text-emerald-700">Sudah Mengumpulkan</p><div class="mt-2 flex items-end justify-between gap-3"><p class="text-3xl font-extrabold text-emerald-800">{{ $terkumpul }}</p><span class="text-xs font-bold text-emerald-700 group-open:hidden">Lihat detail</span><span class="hidden text-xs font-bold text-emerald-700 group-open:inline">Tutup detail</span></div></summary><div class="mt-4 border-t border-emerald-200 pt-3">@forelse($sekolahTerkumpul as $operator)<div class="flex items-center justify-between gap-3 py-2 text-sm"><div><p class="font-bold text-slate-700">{{ $operator->nama_sekolah ?: '-' }}</p><p class="text-xs text-slate-500">{{ $operator->name }}</p></div><span class="shrink-0 text-right text-xs text-emerald-700">{{ $operator->pengajuans->first()?->submitted_at?->translatedFormat('d M Y, H:i') }}</span></div>@empty<p class="text-sm text-slate-500">Belum ada sekolah yang mengumpulkan.</p>@endforelse</div></details>
+                    <details class="group rounded-xl border border-rose-200 bg-rose-50 p-4"><summary class="cursor-pointer list-none"><p class="text-xs font-bold uppercase tracking-wider text-rose-700">Belum Mengumpulkan</p><div class="mt-2 flex items-end justify-between gap-3"><p class="text-3xl font-extrabold text-rose-800">{{ $belumTerkumpul }}</p><span class="text-xs font-bold text-rose-700 group-open:hidden">Lihat detail</span><span class="hidden text-xs font-bold text-rose-700 group-open:inline">Tutup detail</span></div></summary><div class="mt-4 border-t border-rose-200 pt-3">@forelse($sekolahBelumTerkumpul as $operator)<div class="flex items-center justify-between gap-3 py-2 text-sm"><div><p class="font-bold text-slate-700">{{ $operator->nama_sekolah ?: '-' }}</p><p class="text-xs text-slate-500">{{ $operator->name }}</p></div>@if($operator->tagihanKonfirmasis->isNotEmpty())<span class="shrink-0 rounded-full bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-700">Sudah dibaca</span>@else<span class="shrink-0 rounded-full bg-rose-100 px-2 py-1 text-[10px] font-bold text-rose-700">Belum dibaca</span>@endif</div>@empty<p class="text-sm text-slate-500">Semua sekolah sudah mengumpulkan.</p>@endforelse</div></details>
+                </div>
             </section>
         @endif
 
@@ -66,11 +72,22 @@
                                     <span class="rounded-full px-2.5 py-1 text-xs font-bold {{ $statusStyle[$item->status] ?? 'bg-slate-100 text-slate-700' }}">{{ $statusLabel[$item->status] ?? ucfirst($item->status) }}</span>
                                 </div>
                                 <p class="mt-1 text-xs text-slate-500">{{ $item->operator?->nama_sekolah ?: 'Sekolah belum diisi' }} · {{ $item->submitted_at?->translatedFormat('d F Y H:i') }}</p>
-                                <p class="mt-4 whitespace-pre-line text-sm leading-7 text-slate-600">{{ $item->isi }}</p>
+                                @if (filled($item->isi))
+                                    <div class="mt-4 rounded-xl bg-slate-50 p-4"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">Keterangan</p><p class="mt-2 whitespace-pre-line text-sm leading-7 text-slate-700">{{ $item->isi }}</p></div>
+                                @endif
+                                @if (!empty($item->data_tambahan))
+                                    <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                                        @foreach ($item->data_tambahan as $key => $value)
+                                            @continue(blank($value))
+                                            @php($field = collect($jenisPengajuan->form_fields ?? [])->firstWhere('key', $key))
+                                            <div class="rounded-xl border border-slate-100 bg-white p-3"><p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ $field['label'] ?? \Illuminate\Support\Str::of($key)->replace('_', ' ')->title() }}</p><p class="mt-1 whitespace-pre-line break-words text-sm font-semibold leading-6 text-slate-700">{{ is_array($value) ? implode(', ', $value) : $value }}</p></div>
+                                        @endforeach
+                                    </div>
+                                @endif
                                 @if ($item->lampiran)
                                     <a class="mt-3 inline-flex rounded-lg bg-slate-100 px-3 py-2 text-xs font-bold text-blue-600 hover:bg-blue-50" target="_blank" href="{{ asset('storage/'.$item->lampiran) }}">Buka lampiran</a>
                                 @endif
-                                <a href="{{ route('admin.pengajuan.show', $item) }}" class="mt-3 inline-flex rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100">Lihat detail data</a>
+                                <a href="{{ route('admin.pengajuan.show', $item) }}" class="mt-3 inline-flex rounded-lg bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100">Lihat detail &amp; riwayat status</a>
                             </div>
 
                             <form class="w-full rounded-xl bg-slate-50 p-4 lg:w-80" method="POST" action="{{ route('admin.pengajuan.update', $item) }}">
