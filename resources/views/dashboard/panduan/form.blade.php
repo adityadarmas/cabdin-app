@@ -1,4 +1,4 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('content')
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
